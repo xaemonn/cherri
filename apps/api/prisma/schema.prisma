@@ -1,0 +1,348 @@
+// Cherri data model.
+// Fields marked (encrypted) hold AES-256-GCM ciphertext written by CryptoService.
+// Enum values mirror the constants in @cherri/shared (verified by test/enums.test.ts).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum LifeStage {
+  CYCLE
+  TTC
+  PREGNANCY
+  POSTPARTUM
+  PERIMENOPAUSE
+  MENOPAUSE
+}
+
+enum Language {
+  en
+  hi
+  hinglish
+  kn
+}
+
+enum CompanionTone {
+  BESTIE
+  BIG_SIS
+  CLINICAL
+}
+
+enum Flow {
+  NONE
+  SPOTTING
+  LIGHT
+  MEDIUM
+  HEAVY
+}
+
+enum LogSource {
+  MANUAL
+  VOICE
+  CHAT
+}
+
+enum LabFlag {
+  LOW
+  NORMAL
+  HIGH
+  UNKNOWN
+}
+
+enum ScreeningType {
+  PCOS
+  ENDOMETRIOSIS
+  PMDD
+  ANEMIA
+  THYROID
+}
+
+enum RiskBand {
+  LOW
+  MODERATE
+  HIGH
+}
+
+enum ChatRole {
+  USER
+  ASSISTANT
+}
+
+model User {
+  id              String        @id @default(cuid())
+  email           String?       @unique
+  passwordHash    String?
+  isGuest         Boolean       @default(false)
+  name            String?
+  birthYear       Int?
+  lifeStage       LifeStage     @default(CYCLE)
+  language        Language      @default(en)
+  companionTone   CompanionTone @default(BESTIE)
+  avgCycleLength  Int           @default(28)
+  avgPeriodLength Int           @default(5)
+  conditions      String[]
+  timezone        String        @default("Asia/Kolkata")
+  /// Pregnancy: expected date of delivery. Postpartum: the day the baby was born.
+  dueDate         DateTime?     @db.Date
+  deliveryDate    DateTime?     @db.Date
+  /// Age at her first period, and conditions in her mother or sisters.
+  menarcheAge     Int?
+  familyHistory   String[]
+  allergies       String? /// (encrypted)
+  surgeries       String? /// (encrypted)
+  onboardedAt     DateTime?
+  consentAt       DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  sessions        Session[]
+  periods         Period[]
+  logs            DailyLog[]
+  labReports      LabReport[]
+  labResults      LabResult[]
+  screenings      Screening[]
+  chatSessions    ChatSession[]
+  shareLinks      ShareLink[]
+  medications     Medication[]
+  story           SymptomStory?
+  trustedContacts TrustedContact[]
+  mindChecks      MindCheck[]
+}
+
+/// One row per refresh token. Rotation links tokens through `familyId`; reuse of a
+/// rotated token revokes the whole family.
+model Session {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  familyId  String
+  expiresAt DateTime
+  rotatedAt DateTime?
+  revokedAt DateTime?
+  userAgent String?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([familyId])
+}
+
+model Period {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  startDate DateTime  @db.Date
+  endDate   DateTime? @db.Date
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([userId, startDate])
+}
+
+model DailyLog {
+  id         String         @id @default(cuid())
+  userId     String
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date       DateTime       @db.Date
+  flow       Flow?
+  mood       Int?
+  energy     Int?
+  stress     Int?
+  sleepHours Float?
+  painLevel  Int?
+  bbt        Float?
+  lhPositive Boolean?
+  systolic   Int?
+  diastolic  Int?
+  weightKg   Float?
+  notes      String? /// (encrypted)
+  source     LogSource      @default(MANUAL)
+  symptoms   SymptomEntry[]
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  @@unique([userId, date])
+}
+
+model SymptomEntry {
+  id         String   @id @default(cuid())
+  logId      String
+  log        DailyLog @relation(fields: [logId], references: [id], onDelete: Cascade)
+  code       String
+  severity   Int      @default(2)
+  bodyRegion String?
+
+  @@unique([logId, code])
+}
+
+model LabReport {
+  id        String      @id @default(cuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  source    String /// UPLOAD_IMAGE | UPLOAD_PDF | MANUAL
+  fileName  String?
+  labName   String?
+  takenAt   DateTime    @db.Date
+  extractor String? /// which AI provider (or "offline-parser") read the report
+  results   LabResult[]
+  createdAt DateTime    @default(now())
+
+  @@index([userId, takenAt])
+}
+
+model LabResult {
+  id       String    @id @default(cuid())
+  reportId String
+  report   LabReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  code     String?
+  name     String
+  value    Float
+  unit     String?
+  refLow   Float?
+  refHigh  Float?
+  flag     LabFlag
+  takenAt  DateTime  @db.Date
+
+  @@index([userId, code, takenAt])
+}
+
+model Screening {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      ScreeningType
+  answers   Json
+  score     Int
+  maxScore  Int
+  band      RiskBand
+  result    Json
+  createdAt DateTime      @default(now())
+
+  @@index([userId, type, createdAt])
+}
+
+model ChatSession {
+  id        String        @id @default(cuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String?
+  messages  ChatMessage[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([userId, updatedAt])
+}
+
+model ChatMessage {
+  id        String      @id @default(cuid())
+  sessionId String
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role      ChatRole
+  content   String /// (encrypted)
+  meta      Json?
+  createdAt DateTime    @default(now())
+
+  @@index([sessionId, createdAt])
+}
+
+/// A doctor-share link. The token itself is never stored, only its SHA-256 hash.
+model ShareLink {
+  id           String        @id @default(cuid())
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash    String        @unique
+  snapshot     String /// (encrypted) report JSON frozen at creation time
+  expiresAt    DateTime
+  revokedAt    DateTime?
+  maxViews     Int?
+  viewCount    Int           @default(0)
+  lastViewedAt DateTime?
+  accesses     ShareAccess[]
+  createdAt    DateTime      @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model ShareAccess {
+  id          String    @id @default(cuid())
+  shareLinkId String
+  shareLink   ShareLink @relation(fields: [shareLinkId], references: [id], onDelete: Cascade)
+  ipHash      String?
+  userAgent   String?
+  viewedAt    DateTime  @default(now())
+}
+
+/// A medicine or supplement she takes; listed on her doctor report.
+model Medication {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String /// (encrypted)
+  dose      String? /// (encrypted)
+  schedule  String? /// (encrypted)
+  reason    String? /// (encrypted)
+  startedOn DateTime? @db.Date
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+/// Her symptom story in her own words, plus the structured history she confirmed.
+model SymptomStory {
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  text       String /// (encrypted)
+  structured String /// (encrypted) StructuredStory JSON
+  source     String   @default("MANUAL") /// MANUAL | VOICE
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+/// A PHQ-9 or GAD-7 mood check-in. The score is kept in the clear for trends; the answers are not.
+model MindCheck {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String /// PHQ9 | GAD7
+  answers   String /// (encrypted) answer JSON
+  score     Int
+  band      String
+  selfHarm  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, type, createdAt])
+}
+
+/// People who receive her SOS message.
+model TrustedContact {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String /// (encrypted)
+  phone     String /// (encrypted)
+  relation  String? /// (encrypted)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  meta      Json?
+  ipHash    String?
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
