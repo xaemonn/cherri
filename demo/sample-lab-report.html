@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sample lab report (demo)</title>
+<style>
+  body { font-family: Arial, Helvetica, sans-serif; color: #1f2937; margin: 0; padding: 36px 44px; width: 820px; background: #fff; position: relative; }
+  .watermark { position: absolute; top: 420px; left: 90px; transform: rotate(-24deg); font-size: 64px; font-weight: 700; color: rgba(220, 38, 38, 0.10); letter-spacing: 6px; pointer-events: none; }
+  header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid #0f766e; padding-bottom: 12px; }
+  .lab { font-size: 26px; font-weight: 700; color: #0f766e; }
+  .lab small { display: block; font-size: 12px; font-weight: 400; color: #475569; margin-top: 4px; }
+  .badge { font-size: 11px; color: #b91c1c; border: 1px solid #b91c1c; padding: 3px 8px; border-radius: 4px; }
+  .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 30px; font-size: 13px; margin: 16px 0 18px; }
+  .meta b { display: inline-block; width: 120px; color: #475569; font-weight: 600; }
+  h2 { font-size: 14px; background: #f1f5f9; padding: 7px 10px; margin: 18px 0 0; letter-spacing: 1px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th { text-align: left; font-size: 12px; color: #475569; border-bottom: 1px solid #cbd5e1; padding: 8px 10px; }
+  td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; }
+  td.v { font-weight: 700; }
+  td.flag { color: #b91c1c; font-weight: 700; }
+  footer { margin-top: 26px; font-size: 11px; color: #64748b; border-top: 1px solid #e2e8f0; padding-top: 10px; }
+</style>
+</head>
+<body>
+  <div class="watermark">SAMPLE · DEMO ONLY</div>
+  <header>
+    <div class="lab">Cherri Demo Diagnostics<small>Sample report generated for the Cherri hackathon demo. Not a real lab or patient.</small></div>
+    <span class="badge">SAMPLE REPORT</span>
+  </header>
+
+  <div class="meta">
+    <div><b>Patient</b> Ananya (demo persona)</div>
+    <div><b>Sample collected</b> 12/10/2026</div>
+    <div><b>Age / Sex</b> 21 Y / F</div>
+    <div><b>Reported</b> 12/10/2026</div>
+  </div>
+
+  <h2>HAEMATOLOGY</h2>
+  <table>
+    <tr><th>Test</th><th>Result</th><th></th><th>Units</th><th>Reference range</th></tr>
+    <tr><td>Haemoglobin</td><td class="v">10.2</td><td class="flag">L</td><td>g/dL</td><td>12.0 - 15.5</td></tr>
+    <tr><td>MCV</td><td class="v">74</td><td class="flag">L</td><td>fL</td><td>80 - 100</td></tr>
+    <tr><td>Serum Ferritin</td><td class="v">9.0</td><td class="flag">L</td><td>ng/mL</td><td>15 - 150</td></tr>
+  </table>
+
+  <h2>BIOCHEMISTRY &amp; HORMONES</h2>
+  <table>
+    <tr><th>Test</th><th>Result</th><th></th><th>Units</th><th>Reference range</th></tr>
+    <tr><td>TSH (Ultrasensitive)</td><td class="v">2.1</td><td></td><td>µIU/mL</td><td>0.4 - 4.5</td></tr>
+    <tr><td>Vitamin D (25-OH)</td><td class="v">14.2</td><td class="flag">L</td><td>ng/mL</td><td>30 - 100</td></tr>
+    <tr><td>Vitamin B12</td><td class="v">310</td><td></td><td>pg/mL</td><td>200 - 900</td></tr>
+    <tr><td>Testosterone, Total</td><td class="v">78</td><td class="flag">H</td><td>ng/dL</td><td>15 - 70</td></tr>
+    <tr><td>HbA1c</td><td class="v">5.4</td><td></td><td>%</td><td>&lt; 5.7</td></tr>
+  </table>
+
+  <footer>This is a fictional sample created to demonstrate Cherri's Lab Decoder. It must not be used for any medical purpose.</footer>
+</body>
+</html>
