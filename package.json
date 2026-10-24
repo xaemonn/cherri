@@ -1,0 +1,26 @@
+{
+  "name": "cherri",
+  "private": true,
+  "packageManager": "pnpm@10.34.8",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "turbo run dev --filter=@cherri/api --filter=@cherri/web",
+    "dev:api": "turbo run dev --filter=@cherri/api",
+    "dev:web": "turbo run dev --filter=@cherri/web",
+    "dev:mobile": "pnpm --filter @cherri/shared build && pnpm --filter @cherri/mobile start",
+    "build": "turbo run build",
+    "test": "turbo run test --concurrency=1",
+    "typecheck": "turbo run typecheck",
+    "db:up": "docker compose up -d db",
+    "db:down": "docker compose down",
+    "db:migrate": "pnpm --filter @cherri/api db:migrate",
+    "db:seed": "pnpm --filter @cherri/api db:seed",
+    "ai:check": "pnpm --filter @cherri/api ai:check"
+  },
+  "devDependencies": {
+    "turbo": "^2.11.10",
+    "typescript": "~5.9.3"
+  }
+}

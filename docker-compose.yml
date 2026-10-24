@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: cherri-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cherri
+      POSTGRES_PASSWORD: cherri
+      POSTGRES_DB: cherri
+    ports:
+      - '5433:5432'
+    volumes:
+      - cherri-db:/var/lib/postgresql/data
+      - ./infra/db-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U cherri']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  cherri-db:
