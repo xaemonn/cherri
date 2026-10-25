@@ -52,11 +52,10 @@ export function HeroVisual({ className, delay = 0, chips = true }: { className?:
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 1.1, ease: EASE, delay }}
       >
-        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-olive-soft/80 to-transparent" />
         {painting ? (
           <Image
             src="/brand/hero-woman.png"
-            alt="A woman with flowers in her hair, eyes closed"
+            alt="Painted portrait of a woman with flowers and leaves in her hair"
             fill
             priority
             sizes="(min-width: 1024px) 440px, 90vw"
