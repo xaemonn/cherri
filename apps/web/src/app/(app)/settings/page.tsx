@@ -14,6 +14,7 @@ import { PageHeader } from '@/components/ui/misc';
 import { useToast } from '@/components/ui/toast';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { useLanguage } from '@/lib/i18n';
 import { saveTextSize, TEXT_SIZES, useTextSize } from '@/lib/preferences';
 import { CAMOUFLAGE_OPTIONS, saveCamouflage, useCamouflage } from '@/lib/shield';
 
@@ -26,10 +27,11 @@ const STAGE_LABELS: Record<LifeStage, string> = {
   MENOPAUSE: 'Menopause',
 };
 const TONE_LABELS: Record<CompanionTone, string> = { BESTIE: 'Bestie', BIG_SIS: 'Big sis', CLINICAL: 'Straight facts' };
-const LANGUAGE_LABELS: Record<Language, string> = { en: 'English', hinglish: 'Hinglish', hi: 'हिंदी', kn: 'ಕನ್ನಡ' };
+const LANGUAGE_LABELS: Record<Language, string> = { en: 'English', hi: 'हिंदी (शुद्ध देवनागरी)', hinglish: 'Hinglish', kn: 'ಕನ್ನಡ' };
 
 export default function SettingsPage() {
   const { user, setUser, logout } = useAuth();
+  const { setLang } = useLanguage();
   const router = useRouter();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -152,7 +154,11 @@ export default function SettingsPage() {
           </label>
           <label>
             <Label>Language</Label>
-            <Select value={profile.language} onChange={(e) => setProfile({ ...profile, language: e.target.value as Language })}>
+            <Select value={profile.language} onChange={(e) => {
+                const nextLang = e.target.value as Language;
+                setProfile({ ...profile, language: nextLang });
+                if (nextLang === 'hi' || nextLang === 'en') setLang(nextLang);
+              }}>
               {LANGUAGES.map((l) => (
                 <option key={l} value={l}>
                   {LANGUAGE_LABELS[l]}

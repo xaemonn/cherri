@@ -3,8 +3,9 @@ import { FileText, Lock, ShieldCheck, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { Logo } from '@/components/brand/logo';
 import { FeatureDirectory } from '@/components/landing/feature-directory';
+import { LandingHeader } from '@/components/landing/header';
 import { Hero } from '@/components/landing/hero';
-import { LandingCta, NavCta } from '@/components/landing/landing-cta';
+import { LandingCta } from '@/components/landing/landing-cta';
 import { MobileShowcase } from '@/components/landing/mobile-showcase';
 import { MoonSteps } from '@/components/landing/moon-steps';
 import { InView } from '@/components/motion/reveal';
@@ -21,21 +22,9 @@ export default function LandingPage() {
   return (
     <SmoothScroll>
       <div className="overflow-x-clip">
-        <header className="sticky top-3 z-40 px-3 sm:px-6">
-          <nav className="mx-auto flex max-w-6xl items-center justify-between rounded-full border border-line bg-paper/75 py-2 pr-2 pl-5 shadow-lift backdrop-blur-md">
-            <Logo />
-            <div className="hidden items-center gap-8 text-sm font-medium text-ink-soft md:flex">
-              <a href="#features" className="transition-colors hover:text-ink">Features</a>
-              <a href="#app" className="transition-colors hover:text-ink">Mobile app</a>
-              <a href="#how" className="transition-colors hover:text-ink">How it works</a>
-              <a href="#privacy" className="transition-colors hover:text-ink">Privacy</a>
-            </div>
-            <NavCta />
-          </nav>
-        </header>
+        <LandingHeader />
 
         <Hero />
-
 
         <FeatureDirectory />
 
@@ -79,32 +68,32 @@ export default function LandingPage() {
         <footer className="mx-auto max-w-6xl px-5 pt-6 pb-12 text-sm text-ink-soft sm:px-8">
           <div className="flex flex-wrap items-start justify-between gap-8 border-t border-line pt-8">
             <div>
-              <Logo />
-              <p className="mt-3 max-w-sm">Cherri gives health information, not a diagnosis. Always talk to a qualified doctor about your symptoms.</p>
+              <Logo size="md" />
+              <p className="mt-3 max-w-sm text-ink-soft">
+                Cherri gives health information, not a diagnosis. Always talk to a qualified doctor about your symptoms.
+              </p>
             </div>
             <div>
               <p className="mb-2 font-semibold text-ink">Need help now?</p>
-              <ul className="space-y-1">
+              <ul className="space-y-1 text-xs">
                 {INDIA_HELPLINES.map((h) => (
                   <li key={h.number}>
-                    <a href={`tel:${h.number}`} className="hover:text-ink">
+                    <a href={`tel:${h.number}`} className="hover:text-olive-deep transition-colors">
                       <strong>{h.number}</strong> · {h.name}
                     </a>
                   </li>
                 ))}
               </ul>
             </div>
+            <div>
+              <p className="mb-2 font-semibold text-ink">Navigation</p>
+              <div className="flex flex-col gap-1 text-xs">
+                <Link href="/login" className="hover:text-olive-deep transition-colors">Sign in</Link>
+                <Link href="/login" className="hover:text-olive-deep transition-colors">Create account</Link>
+                <Link href="/app" className="hover:text-olive-deep transition-colors">Get the mobile app</Link>
+              </div>
+            </div>
           </div>
-          <p className="mt-8">
-            Made by Team Goodies ·{' '}
-            <Link href="/login" className="underline underline-offset-4">
-              Log in
-            </Link>{' '}
-            ·{' '}
-            <Link href="/app" className="underline underline-offset-4">
-              Get the app
-            </Link>
-          </p>
         </footer>
       </div>
     </SmoothScroll>

@@ -3,9 +3,11 @@
 import { ApiError } from '@cherri/shared';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Suspense, useState, type ReactNode } from 'react';
+import { PageTranslator } from '@/components/i18n/page-translator';
 import { ScreenShield } from '@/components/safety/quick-exit';
 import { ToastProvider } from '@/components/ui/toast';
 import { AuthProvider } from '@/lib/auth';
+import { LanguageProvider } from '@/lib/i18n';
 
 export function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
@@ -23,15 +25,18 @@ export function Providers({ children }: { children: ReactNode }) {
   );
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <ToastProvider>
-          {children}
-          <Suspense fallback={null}>
-            <ScreenShield />
-          </Suspense>
-        </ToastProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <LanguageProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <ToastProvider>
+            {children}
+            <Suspense fallback={null}>
+              <ScreenShield />
+            </Suspense>
+            <PageTranslator />
+          </ToastProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </LanguageProvider>
   );
 }
