@@ -10,7 +10,7 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://YOUR-API-HOST/api"
+        "EXPO_PUBLIC_API_URL": "https://cherri-xaemon.vercel.app/api"
       }
     },
     "production": {
@@ -18,7 +18,7 @@
         "buildType": "app-bundle"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://YOUR-API-HOST/api"
+        "EXPO_PUBLIC_API_URL": "https://cherri-xaemon.vercel.app/api"
       }
     }
   }

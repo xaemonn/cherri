@@ -8,8 +8,9 @@ Project developed for the recHERsion Hackathon.
 
 ## Evaluation Links
 
+- Live Web Deployment: https://cherri-xaemon.vercel.app/
+- GitHub Repository: https://github.com/xaemonn/cherri
 - Demo Video: https://drive.google.com/file/d/1uPROPVRHD_KjauUyjZ7XHZrVantbhXav/view?usp=sharing
-- Live Web Deployment: [INSERT DEPLOYMENT URL HERE]
 - Mobile App Preview: See *Step 4: Run the Mobile App* in Section 2 for Expo Go, standalone APK and install-from-browser instructions.
 
 ---
