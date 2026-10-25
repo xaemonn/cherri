@@ -6,6 +6,8 @@ import { isoDateSchema } from './common';
 export const chatRequestSchema = z.object({
   message: z.string().trim().min(1).max(2000),
   sessionId: z.string().min(1).max(64).optional(),
+  /** What she is looking at in the app (page name and visible summary), so the assistant can answer about it. */
+  pageContext: z.string().trim().max(2000).optional(),
 });
 
 export const parseLogRequestSchema = z.object({

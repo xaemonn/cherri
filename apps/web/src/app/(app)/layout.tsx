@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
+import { ChatDock } from '@/components/chat/chat-dock';
 import { QuickExitFab } from '@/components/safety/quick-exit';
 import { BottomNav, NavFallback, Sidebar } from '@/components/shell/nav';
 import { PageLoader } from '@/components/ui/misc';
@@ -31,6 +32,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <main className="mx-auto w-full max-w-6xl px-4 pt-6 pb-32 sm:px-6 lg:px-10 lg:pt-10 lg:pb-16">{children}</main>
       <Suspense fallback={null}>
         <BottomNav />
+        <ChatDock />
       </Suspense>
     </div>
   );

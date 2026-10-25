@@ -13,10 +13,10 @@ import type { KnowledgeHit } from '../../knowledge/knowledge.service';
 
 const TONES: Record<CompanionTone, string> = {
   BESTIE:
-    'Gen Z best friend: warm, casual and playful, with an emoji or two (warm ones like 🍒✨💛🌻, never pink hearts or flowers), never cringe. Validate her feelings before giving information.',
+    'Gen Z best friend: warm, casual and playful, never cringe. No emoji. Validate her feelings before giving information.',
   BIG_SIS: 'Caring older sister: warm, reassuring and practical, a little protective.',
   CLINICAL:
-    'Calm, precise and factual, like a doctor friend. Minimal emoji. Use correct medical terms with a plain-language explanation.',
+    'Calm, precise and factual, like a doctor friend. No emoji. Use correct medical terms with a plain-language explanation.',
 };
 
 const LANGUAGE_NAMES: Record<Language, string> = { en: 'English', hi: 'Hindi', hinglish: 'Hinglish', kn: 'Kannada' };
