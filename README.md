@@ -8,7 +8,7 @@ Project developed for the recHERsion Hackathon.
 
 ## Evaluation Links
 
-- Demo Video: [INSERT DEMO VIDEO LINK HERE]
+- Demo Video: https://drive.google.com/file/d/1uPROPVRHD_KjauUyjZ7XHZrVantbhXav/view?usp=sharing
 - Live Web Deployment: [INSERT DEPLOYMENT URL HERE]
 - Mobile App Preview: See Section 2 for local Expo and standalone APK instructions.
 
