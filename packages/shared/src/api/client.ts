@@ -20,6 +20,8 @@ import type { ScreeningDefinition } from '../screenings/definitions';
 import type { MindCheckType } from '../screenings/mind';
 import type { SymptomDef } from '../catalog/symptoms';
 import type { SaveStoryInput } from '../visit/story';
+import type { ClinicalSnapshot, ConsultStatus, CreateConsultInput, ConsultMessageInput, DoctorMessageInput } from '../consult';
+import type { PinInput, ReminderInput, UnlockInput } from '../schemas/privacy';
 import type {
   Article,
   ArticleMeta,
@@ -27,7 +29,12 @@ import type {
   ChatMessageDto,
   ChatReply,
   ChatSessionSummary,
+  ConsultationDetail,
+  ConsultationSummary,
+  ConsultMessageDto,
   CycleResponse,
+  DoctorInboxItem,
+  ReminderDto,
   DashboardResponse,
   DemoLoadResult,
   DoctorReport,
@@ -229,6 +236,10 @@ export function createApiClient(options: ApiClientOptions) {
       get: () => request<PublicUser>('GET', '/me'),
       update: (input: UpdateProfileInput) => request<PublicUser>('PATCH', '/me', { body: input }),
       onboard: (input: OnboardingInput) => request<PublicUser>('POST', '/me/onboarding', { body: input }),
+      setPin: (input: PinInput) => request<PublicUser>('PUT', '/me/pin', { body: input }),
+      removePin: () => request<PublicUser>('DELETE', '/me/pin'),
+      /** Re-opens the app after a quick exit. */
+      unlock: (input: UnlockInput) => request<{ ok: true }>('POST', '/me/unlock', { body: input }),
       background: () => request<HealthBackground>('GET', '/me/background'),
       updateBackground: (input: HealthBackgroundInput) => request<HealthBackground>('PUT', '/me/background', { body: input }),
       exportData: () => request<Record<string, unknown>>('GET', '/me/export'),
@@ -337,6 +348,28 @@ export function createApiClient(options: ApiClientOptions) {
       structure: (text: string) => request<StructuredStoryResult>('POST', '/story/structure', { body: { text } }),
       save: (input: SaveStoryInput) => request<SymptomStoryDto>('PUT', '/story', { body: input }),
       remove: () => request<void>('DELETE', '/story'),
+    },
+    consults: {
+      list: () => request<ConsultationSummary[]>('GET', '/consultations'),
+      /** The clinical snapshot that would be attached, for her to review before consenting. */
+      preview: () => request<ClinicalSnapshot>('GET', '/consultations/preview'),
+      create: (input: CreateConsultInput) => request<ConsultationDetail>('POST', '/consultations', { body: input }),
+      get: (id: string) => request<ConsultationDetail>('GET', `/consultations/${id}`),
+      send: (id: string, input: ConsultMessageInput) => request<ConsultMessageDto>('POST', `/consultations/${id}/messages`, { body: input }),
+      /** She confirms she is safe or has had emergency care; routine chat resumes. */
+      acknowledgeEmergency: (id: string) => request<ConsultationDetail>('POST', `/consultations/${id}/emergency-ack`),
+    },
+    doctor: {
+      inbox: (status?: ConsultStatus) => request<DoctorInboxItem[]>('GET', '/doctor/consultations', { query: { status } }),
+      get: (id: string) => request<ConsultationDetail>('GET', `/doctor/consultations/${id}`),
+      reply: (id: string, input: DoctorMessageInput) => request<ConsultMessageDto>('POST', `/doctor/consultations/${id}/messages`, { body: input }),
+      recommendVisit: (id: string) => request<ConsultationDetail>('POST', `/doctor/consultations/${id}/in-person`),
+      resolve: (id: string) => request<ConsultationDetail>('POST', `/doctor/consultations/${id}/resolve`),
+    },
+    reminders: {
+      list: () => request<ReminderDto[]>('GET', '/reminders'),
+      create: (input: ReminderInput) => request<ReminderDto>('POST', '/reminders', { body: input }),
+      dismiss: (id: string) => request<void>('DELETE', `/reminders/${id}`),
     },
     contacts: {
       list: () => request<TrustedContactDto[]>('GET', '/contacts'),

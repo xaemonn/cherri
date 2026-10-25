@@ -52,7 +52,7 @@ export function SharedReport({ params }: { params: Promise<{ token: string }> })
       </header>
       {error ? (
         <div className="rounded-card border border-ink/10 bg-paper p-8 text-center shadow-lift">
-          <p className="text-4xl">🔒</p>
+          <p className="text-4xl"></p>
           <h1 className="mt-3 text-2xl font-semibold">{error}</h1>
           <p className="mt-2 text-ink-soft">Shared links expire to protect the patient’s privacy. Ask them to create a new one in Cherri.</p>
         </div>

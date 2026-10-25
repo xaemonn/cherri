@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
+import { PasswordInput } from '@/components/password-input';
 import { Button, ErrorText, Screen, T } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { colors, fonts } from '@/lib/theme';
@@ -26,13 +27,13 @@ export default function Login() {
 
   return (
     <Screen bottomInset={40}>
-      <T variant="title">Welcome back 🍒</T>
+      <T variant="title">Welcome back</T>
       <T variant="small" style={{ marginTop: 6 }}>
         Demo account: demo@cherri.app / cherri-demo-2026
       </T>
       <View style={{ gap: 12, marginTop: 24 }}>
         <TextInput style={styles.input} placeholder="Email" placeholderTextColor={colors.inkFaint} autoCapitalize="none" keyboardType="email-address" value={email} onChangeText={setEmail} />
-        <TextInput style={styles.input} placeholder="Password" placeholderTextColor={colors.inkFaint} secureTextEntry value={password} onChangeText={setPassword} onSubmitEditing={() => void submit()} />
+        <PasswordInput style={styles.input} placeholder="Password" placeholderTextColor={colors.inkFaint} value={password} onChangeText={setPassword} onSubmitEditing={() => void submit()} />
         {error !== null && <ErrorText error={error} />}
         <Button label={busy ? 'One sec…' : 'Log in'} onPress={() => void submit()} loading={busy} disabled={!email || !password} />
       </View>

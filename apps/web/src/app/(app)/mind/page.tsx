@@ -56,7 +56,7 @@ export default function MindPage() {
       setAnswers({});
       await Promise.all([queryClient.invalidateQueries({ queryKey: MIND_KEY }), queryClient.invalidateQueries({ queryKey: ['report'] })]);
     } catch (error) {
-      toast(error instanceof Error ? error.message : 'Could not save.', '😕');
+      toast(error instanceof Error ? error.message : 'Could not save.');
     } finally {
       setSaving(false);
     }

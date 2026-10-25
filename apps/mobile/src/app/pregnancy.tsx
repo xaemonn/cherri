@@ -9,9 +9,9 @@ import { useMotherhood } from '@/lib/queries';
 import { colors, fonts } from '@/lib/theme';
 
 const RESULT_STYLE: Record<DangerLevel, { shape: string; bg: string; fg: string }> = {
-  RED: { shape: '🛑', bg: colors.cherry, fg: colors.cream },
-  AMBER: { shape: '⚠️', bg: '#FFEFC2', fg: colors.ochreDeep },
-  GREEN: { shape: '🟢', bg: '#E6F3C8', fg: colors.oliveDeep },
+  RED: { shape: '', bg: colors.cherry, fg: colors.cream },
+  AMBER: { shape: '', bg: '#FFEFC2', fg: colors.ochreDeep },
+  GREEN: { shape: '', bg: '#E6F3C8', fg: colors.oliveDeep },
 };
 
 const ANSWERS: Array<{ value: DangerAnswer; label: string }> = [
@@ -83,7 +83,7 @@ export default function PregnancyScreen() {
           <Text style={styles.big}>
             {status.age.weeks} weeks {status.age.days > 0 ? `${status.age.days} days` : ''}
           </Text>
-          {status.baby && <T variant="h3">{status.baby.emoji} About the size of {status.baby.name}</T>}
+          {status.baby && <T variant="h3">About the size of {status.baby.name}</T>}
           <T variant="small">
             {status.age.daysToGo} days to go · due {formatDay(status.age.dueDate, { year: true })}
           </T>
@@ -108,7 +108,7 @@ export default function PregnancyScreen() {
           <View style={styles.wrap}>
             {result.call.map((number) => (
               <Pressable key={number} onPress={() => void Linking.openURL(`tel:${number}`)} style={styles.call}>
-                <Text style={styles.callText}>📞 {number}</Text>
+                <Text style={styles.callText}>{number}</Text>
               </Pressable>
             ))}
           </View>

@@ -1,7 +1,7 @@
 'use client';
 
 import { verdictStyles, type Myth, type MythCheck } from '@cherri/shared';
-import { ArrowRight, Search } from 'lucide-react';
+import { ArrowRight, BookOpen, Search } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -12,7 +12,7 @@ import { ErrorNote, EvidenceMeter, PageHeader, PageLoader, Spinner } from '@/com
 import { api } from '@/lib/api';
 import { useArticles, useMyths } from '@/lib/queries';
 
-const DECK_TONES = ['#E6E9D3', '#F3E6C6', '#DFE7E3', '#F0E0CC', '#E6EADD'];
+const DECK_TONES = ['#F8E6EE', '#F3E6C6', '#DFE7E3', '#F0E0CC', '#E6EADD'];
 
 function MythDeck({ myths }: { myths: Myth[] }) {
   const [index, setIndex] = useState(0);
@@ -35,7 +35,7 @@ function MythDeck({ myths }: { myths: Myth[] }) {
         <span>
           Card {(index % myths.length) + 1} of {myths.length}
         </span>
-        <span>Score: {score} 🍒</span>
+        <span>Score: {score}</span>
       </div>
       <AnimatePresence mode="wait">
         <motion.div
@@ -52,9 +52,9 @@ function MythDeck({ myths }: { myths: Myth[] }) {
               <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mt-5">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="rounded-full px-3 py-1 text-sm font-semibold" style={{ background: verdict.bg, color: verdict.ink }}>
-                    {verdict.emoji} {verdict.label}
+                    {verdict.label}
                   </span>
-                  <span className="text-sm font-bold">{correct ? 'You got it! 🎉' : 'Not quite!'}</span>
+                  <span className="text-sm font-bold">{correct ? 'You got it!' : 'Not quite!'}</span>
                 </div>
                 <p className="mt-3 text-[15px]">{myth.explanation}</p>
                 <EvidenceMeter level={myth.evidence} className="mt-3" />
@@ -62,10 +62,10 @@ function MythDeck({ myths }: { myths: Myth[] }) {
             ) : (
               <div className="mt-8 grid grid-cols-2 gap-3">
                 <Button variant="outline" size="lg" onClick={() => choose('myth')}>
-                  ❌ Myth
+                  Myth
                 </Button>
                 <Button size="lg" onClick={() => choose('fact')}>
-                  ✅ Fact
+                  Fact
                 </Button>
               </div>
             )}
@@ -128,7 +128,7 @@ function ClaimChecker() {
       {result && verdict && (
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mt-4 rounded-3xl bg-paper p-4 text-ink">
           <span className="rounded-full px-3 py-1 text-sm font-semibold" style={{ background: verdict.bg, color: verdict.ink }}>
-            {verdict.emoji} {verdict.label}
+            {verdict.label}
           </span>
           <p className="mt-3 text-[15px]">{result.explanation.replace(/\s*\[\d+\]/g, '')}</p>
           <EvidenceMeter level={result.evidence} className="mt-3" />
@@ -173,15 +173,17 @@ export default function LearnPage() {
         {articles.isLoading ? (
           <PageLoader />
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {articles.data?.map((a) => (
-              <Link key={a.id} href={`/learn/${a.id}`} className="group flex flex-col rounded-card border border-line bg-paper p-5 shadow-soft transition-transform hover:-translate-y-1">
-                <p className="text-xs font-bold tracking-wide text-ink-soft uppercase">{a.source}</p>
-                <h3 className="mt-1 text-lg leading-snug font-semibold">{a.title}</h3>
-                <p className="mt-2 line-clamp-3 text-sm text-ink-soft">{a.summary}</p>
-                <span className="mt-auto pt-3 text-sm font-bold">
-                  Read <ArrowRight className="inline size-4 transition-transform group-hover:translate-x-1" />
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {articles.data?.map((a, i) => (
+              <Link key={a.id} href={`/learn/${a.id}`} className="group flex items-center gap-3 rounded-2xl border border-line bg-paper px-4 py-3.5 transition-colors hover:bg-olive-soft">
+                <span className={`grid size-10 shrink-0 place-items-center rounded-xl ${['bg-olive-soft text-olive-deep', 'bg-dusk-soft text-dusk-deep', 'bg-ochre-soft text-ochre-deep'][i % 3]}`}>
+                  <BookOpen className="size-4" />
                 </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate font-semibold">{a.title}</span>
+                  <span className="block truncate text-xs text-ink-faint">{a.source.split(/[;,(]/)[0]}</span>
+                </span>
+                <ArrowRight className="size-4 shrink-0 text-ink-faint transition-transform group-hover:translate-x-1" />
               </Link>
             ))}
           </div>

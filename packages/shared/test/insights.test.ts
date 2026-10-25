@@ -85,7 +85,7 @@ describe('red flags', () => {
     const flags = detectRedFlags({ today: TODAY, lifeStage: 'CYCLE', age: 21, periods: demo.periods, logs: demo.logs, labs: demoLabs, prediction });
     const codes = flags.map((f) => f.code);
     expect(codes).toEqual(
-      expect.arrayContaining(['INFREQUENT_PERIODS', 'IRREGULAR_CYCLES', 'HEAVY_BLEEDING', 'SEVERE_PERIOD_PAIN', 'LOW_HAEMOGLOBIN', 'LOW_VITAMIN_D']),
+      expect.arrayContaining(['INFREQUENT_PERIODS', 'IRREGULAR_CYCLES', 'PBAC_HEAVY', 'SEVERE_PERIOD_PAIN', 'LOW_HAEMOGLOBIN', 'LOW_VITAMIN_D']),
     );
     expect(codes).not.toContain('NO_PERIOD_90_DAYS');
   });

@@ -15,6 +15,11 @@ export * from './insights/redFlags';
 export * from './insights/summary';
 export * from './insights/vitals';
 export * from './insights/medicationMood';
+export * from './insights/pbac';
+
+export * from './medicines/guardian';
+export * from './contraception/emergency';
+export * from './consult';
 
 export * from './pregnancy/care';
 export * from './pregnancy/dangerSigns';
@@ -40,6 +45,7 @@ export * from './schemas/health';
 export * from './schemas/ai';
 export * from './schemas/reports';
 export * from './schemas/visit';
+export * from './schemas/privacy';
 export * from './demo';
 
 export * from './api/types';

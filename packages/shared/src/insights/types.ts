@@ -1,5 +1,6 @@
 import type { FlowLevel, LabFlag } from '../constants';
 import type { ISODate } from '../dates';
+import type { PbacEntry } from './pbac';
 
 /** Minimal daily-log shape the insight engines work on (decoupled from the database). */
 export interface LogRecord {
@@ -12,6 +13,8 @@ export interface LogRecord {
   systolic?: number | null;
   diastolic?: number | null;
   weightKg?: number | null;
+  /** Pictorial blood-loss chart entries for a bleeding day. */
+  pbac?: PbacEntry | null;
   symptoms: ReadonlyArray<{ code: string; severity: number }>;
 }
 

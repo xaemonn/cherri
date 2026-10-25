@@ -36,6 +36,8 @@ import type { AuthTokens } from '../schemas/auth';
 import type { ChatAction, Citation } from '../schemas/ai';
 import type { FamilyCondition } from '../constants';
 import type { StructuredStory } from '../visit/story';
+import type { ClinicalSnapshot, ConsultCategory, ConsultEmergency, ConsultStatus, DoctorSpecialty, Role } from '../consult';
+import type { PbacEntry } from '../insights/pbac';
 
 export interface ApiErrorBody {
   error: { status: number; code: string; message: string; details?: unknown };
@@ -57,6 +59,9 @@ export interface PublicUser {
   timezone: string;
   dueDate: ISODate | null;
   deliveryDate: ISODate | null;
+  role: Role;
+  /** A 4-digit privacy PIN is set (it locks the app after a quick exit). */
+  hasPin: boolean;
   onboarded: boolean;
   createdAt: string;
 }
@@ -79,6 +84,7 @@ export interface LogDto {
   systolic: number | null;
   diastolic: number | null;
   weightKg: number | null;
+  pbac: PbacEntry | null;
   notes: string | null;
   source: LogSource;
   symptoms: Array<{ code: string; severity: number; bodyRegion: string | null }>;
@@ -345,6 +351,72 @@ export interface DoctorReport {
   notYetOnRecord?: string[];
   /** Latest PHQ-9 / GAD-7 totals. */
   mindChecks?: Array<{ type: MindCheckType; title: string; score: number; maxScore: number; label: string; date: ISODate; selfHarm: boolean }>;
+  /** Measured menstrual blood loss (PBAC) for the most recent periods with entries. */
+  bloodLoss?: ReportBloodLoss | null;
+}
+
+export interface ReportBloodLoss {
+  score: number;
+  estimatedMl: number;
+  heavy: boolean;
+  start: ISODate;
+  clotsSmall: number;
+  clotsLarge: number;
+  flooding: number;
+  cycles: Array<{ start: ISODate; score: number; estimatedMl: number; heavy: boolean }>;
+}
+
+export interface DoctorProfileDto {
+  name: string;
+  specialty: DoctorSpecialty;
+  registrationNo: string;
+  verified: boolean;
+}
+
+export interface ConsultMessageDto {
+  id: string;
+  sender: 'PATIENT' | 'DOCTOR' | 'SYSTEM';
+  kind: 'TEXT' | 'VOICE' | 'TESTS' | 'IN_PERSON' | 'RESOLVED' | 'EMERGENCY';
+  body: string;
+  tests: string[];
+  createdAt: string;
+}
+
+export interface ConsultationSummary {
+  id: string;
+  category: ConsultCategory;
+  status: ConsultStatus;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+  emergencyAt: string | null;
+  doctor: DoctorProfileDto | null;
+  lastMessage: { sender: ConsultMessageDto['sender']; preview: string; at: string } | null;
+}
+
+export interface ConsultationDetail extends ConsultationSummary {
+  snapshot: ClinicalSnapshot;
+  messages: ConsultMessageDto[];
+  inPersonAdvisedAt: string | null;
+  resolvedAt: string | null;
+  /** Routine chat is paused after an emergency message until she confirms she is safe. */
+  frozen: boolean;
+}
+
+export interface DoctorInboxItem extends ConsultationSummary {
+  patient: { firstName: string | null; age: number | null; lifeStage: string };
+}
+
+export interface ConsultEmergencyResponse {
+  emergency: ConsultEmergency;
+}
+
+export interface ReminderDto {
+  id: string;
+  kind: 'PREGNANCY_TEST';
+  title: string;
+  dueOn: ISODate;
+  due: boolean;
 }
 
 export interface MindCheckRecord extends MindCheckResult {

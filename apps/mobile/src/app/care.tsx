@@ -11,7 +11,7 @@ export default function Care() {
       <Card sticker tone="matcha" style={{ marginTop: 16, gap: 10 }}>
         <T variant="h3">Gynaecologists near you</T>
         <T variant="small">Opens your maps app with women’s health clinics around you.</T>
-        <Button label="📍 Find nearby" onPress={() => void Linking.openURL('https://www.google.com/maps/search/gynaecologist+near+me')} />
+        <Button label="Find nearby" onPress={() => void Linking.openURL('https://www.google.com/maps/search/gynaecologist+near+me')} />
       </Card>
 
       <SectionTitle eyebrow="Free & government" title="Care that costs nothing" />

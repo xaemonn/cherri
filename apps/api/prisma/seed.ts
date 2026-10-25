@@ -2,6 +2,7 @@
  * Seeds ready-to-demo accounts (password cherri-demo-2026 for both):
  *   demo@cherri.app       Ananya, 21: irregular cycles, painful periods, low iron
  *   pregnancy@cherri.app  Meera, 27: 30 weeks pregnant with rising blood pressure
+ *   doctor@cherri.app     Dr. Kavya Rao (demo), verified gynaecologist for the doctor portal (cherri-doctor-2026)
  * Run with `pnpm db:seed` (re-running replaces the demo accounts).
  */
 import { PrismaClient } from '@prisma/client';
@@ -10,6 +11,7 @@ import { todayIn, type DemoPersona } from '@cherri/shared';
 import { existsSync } from 'node:fs';
 import { CryptoService } from '../src/common/crypto.service';
 import { loadEnv } from '../src/config/env';
+import { ensureDemoDoctor, DEMO_DOCTOR_EMAIL, DEMO_DOCTOR_PASSWORD } from '../src/consult/demo-doctor';
 import { seedDemoHistory } from '../src/demo/demo-seeder';
 
 const DEMO_PASSWORD = 'cherri-demo-2026';
@@ -33,6 +35,8 @@ async function main(): Promise<void> {
       const counts = await seedDemoHistory(prisma, (text) => crypto.encrypt(text), user.id, todayIn(user.timezone), account.persona);
       console.log(`Seeded ${account.email} / ${DEMO_PASSWORD}:`, counts);
     }
+    await ensureDemoDoctor(prisma);
+    console.log(`Doctor portal: ${DEMO_DOCTOR_EMAIL} / ${DEMO_DOCTOR_PASSWORD}`);
   } finally {
     await prisma.$disconnect();
   }

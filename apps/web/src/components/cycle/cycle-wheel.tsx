@@ -39,7 +39,7 @@ export function CycleWheel({
   return (
     <div className={className} style={{ position: 'relative', aspectRatio: '1 / 1' }}>
       <svg viewBox={`0 0 ${size} ${size}`} className="size-full" role="img" aria-label={`Cycle day ${day} of about ${cycleLength}`}>
-        <circle cx={c} cy={c} r={r + 17} fill="#FBF7EF" stroke="#33261C" strokeWidth="2.5" />
+        <circle cx={c} cy={c} r={r + 17} fill="#FFFCFB" stroke="#2E2230" strokeWidth="2.5" />
         {Array.from({ length: total }, (_, i) => {
           const d = i + 1;
           const phase = phaseForDay(d, cycleLength, periodLength);
@@ -57,8 +57,8 @@ export function CycleWheel({
             />
           );
         })}
-        <circle cx={marker.x} cy={marker.y} r="14" fill="#FBF7EF" stroke="#33261C" strokeWidth="3" />
-        <circle cx={marker.x} cy={marker.y} r="5" fill="#33261C" />
+        <circle cx={marker.x} cy={marker.y} r="14" fill="#FFFCFB" stroke="#2E2230" strokeWidth="3" />
+        <circle cx={marker.x} cy={marker.y} r="5" fill="#2E2230" />
       </svg>
       <div className="absolute inset-[22%] grid place-items-center text-center">{children}</div>
     </div>

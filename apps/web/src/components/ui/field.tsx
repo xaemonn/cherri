@@ -1,4 +1,7 @@
-import type { ComponentProps } from 'react';
+'use client';
+
+import { Eye, EyeOff } from 'lucide-react';
+import { useState, type ComponentProps } from 'react';
 import { cn } from '@/lib/cn';
 
 const base =
@@ -31,5 +34,24 @@ export function FieldError({ children }: { children?: React.ReactNode }) {
     <p role="alert" className="mt-2 rounded-xl bg-cherry-soft px-3 py-2 text-sm font-medium text-cherry-deep">
       {children}
     </p>
+  );
+}
+
+/** A password field with a show/hide eye button. */
+export function PasswordInput({ className, ...props }: Omit<ComponentProps<'input'>, 'type'>) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <span className="relative block">
+      <input type={visible ? 'text' : 'password'} className={cn(base, 'h-12 pr-12', className)} {...props} />
+      <button
+        type="button"
+        onClick={() => setVisible((v) => !v)}
+        aria-label={visible ? 'Hide password' : 'Show password'}
+        aria-pressed={visible}
+        className="absolute inset-y-0 right-1 my-auto grid size-10 place-items-center rounded-full text-ink-soft hover:bg-cream-deep hover:text-ink"
+      >
+        {visible ? <EyeOff className="size-5" /> : <Eye className="size-5" />}
+      </button>
+    </span>
   );
 }

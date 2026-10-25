@@ -30,7 +30,7 @@ export default function CyclePage() {
       </PageHeader>
 
       {!prediction?.hasData ? (
-        <EmptyState emoji="🗓️" title="No periods logged yet">
+        <EmptyState title="No periods logged yet">
           Log your period flow on the Log page and Cherri will start predicting.
           <div className="mt-4">
             <ButtonLink href="/log" size="sm">
@@ -79,7 +79,7 @@ export default function CyclePage() {
                     <span className="size-4 shrink-0 rounded-full" style={{ background: phaseColors[phase].fill }} />
                     <span className="text-sm">
                       <strong>
-                        {PHASE_GUIDES[phase].emoji} {PHASE_GUIDES[phase].vibe}
+                        {PHASE_GUIDES[phase].vibe}
                       </strong>{' '}
                       <span className="text-ink-soft">· {PHASE_GUIDES[phase].name}</span>
                     </span>

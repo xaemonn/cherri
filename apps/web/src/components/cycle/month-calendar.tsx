@@ -94,12 +94,12 @@ export function MonthCalendar({
                       : kind === 'ovulation'
                         ? phaseColors.OVULATORY.fill
                         : undefined,
-                color: kind === 'period' ? '#FBF7EF' : undefined,
+                color: kind === 'period' ? '#FFFCFB' : undefined,
                 border: kind === 'predicted' ? `2.5px dashed ${phaseColors.MENSTRUAL.fill}` : undefined,
               }}
             >
               {Number(date.slice(8))}
-              {kind === 'ovulation' && <span className="absolute -top-1 -right-1 text-[10px]">✨</span>}
+              {kind === 'ovulation' && <span className="absolute -top-1 -right-1 text-[10px]"></span>}
             </span>
           );
         })}

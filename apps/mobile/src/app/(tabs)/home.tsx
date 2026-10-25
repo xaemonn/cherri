@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { CycleWheel } from '@/components/cycle-wheel';
 import { FlagCard, PatternCard } from '@/components/insight-cards';
+import { ScaleIcon } from '@/components/scale-icon';
+import { QuickExitButton } from '@/components/shield';
 import { TalkToLog } from '@/components/talk-to-log';
 import { Button, Card, ErrorText, Loader, Screen, SectionTitle, Sticker, T, tap } from '@/components/ui';
 import { api } from '@/lib/api';
@@ -33,10 +35,11 @@ export default function Home() {
 
   return (
     <Screen>
+      <QuickExitButton />
       <T variant="small">{formatDay(data.today, { weekday: true })}</T>
       <T variant="title">
         {greeting(hour)}
-        {name ? `, ${name}` : ''} {hour < 17 ? '☀️' : '🌙'}
+        {name ? `, ${name}` : ''} {hour < 17 ? '' : ''}
       </T>
       {data.streak > 0 && (
         <Sticker radius={999} offset={3} style={{ alignSelf: 'flex-start', marginTop: 12 }}>
@@ -54,7 +57,7 @@ export default function Home() {
               <T variant="eyebrow">Day</T>
               <Text style={styles.day}>{cycle.day}</Text>
               <Text style={[styles.vibe, { color: phaseColors[cycle.phase].ink }]}>
-                {cycle.guide.emoji} {cycle.guide.vibe}
+                {cycle.guide.vibe}
               </Text>
             </CycleWheel>
             <T variant="h2" style={{ marginTop: 14 }}>
@@ -77,7 +80,7 @@ export default function Home() {
               </View>
             )}
             <T variant="small" style={{ marginTop: 10 }}>
-              ✨ {cycle.confidenceNote}
+              {cycle.confidenceNote}
             </T>
           </Card>
         </View>
@@ -88,7 +91,7 @@ export default function Home() {
               <>
                 <T variant="eyebrow">Trimester {data.motherhood.age.trimester}</T>
                 <Text style={styles.day}>{data.motherhood.age.weeks} weeks</Text>
-                {data.motherhood.baby && <T variant="h3">{data.motherhood.baby.emoji} About the size of {data.motherhood.baby.name}</T>}
+                {data.motherhood.baby && <T variant="h3">About the size of {data.motherhood.baby.name}</T>}
                 <T variant="small">{data.motherhood.age.daysToGo} days to go</T>
               </>
             ) : data.motherhood?.stage === 'POSTPARTUM' ? (
@@ -97,7 +100,7 @@ export default function Home() {
                 <Text style={styles.day}>Week {data.motherhood.age.weeks + 1}</Text>
               </>
             ) : (
-              <T variant="h2">Add your due date to unlock your weekly care plan 🤰</T>
+              <T variant="h2">Add your due date to unlock your weekly care plan</T>
             )}
             <T variant="small" style={{ fontFamily: fonts.bold, color: colors.ink }}>
               Open care plan & danger-sign check →
@@ -106,7 +109,7 @@ export default function Home() {
         </Pressable>
       ) : (
         <Card tone="matcha" style={{ marginTop: 18, gap: 10 }}>
-          <T variant="h2">Let’s find your rhythm 🌙</T>
+          <T variant="h2">Let’s find your rhythm</T>
           <T variant="small">Log your period when it starts and Cherri will start predicting.</T>
           <Button label="Log today" onPress={() => router.push('/log')} />
           {user?.isGuest && (
@@ -138,16 +141,16 @@ export default function Home() {
               key={m.value}
               onPress={() => {
                 tap();
-                save.mutate({ mood: m.value }, { onSuccess: () => flash(`Mood saved: ${m.label} ${m.emoji}`) });
+                save.mutate({ mood: m.value }, { onSuccess: () => flash(`Mood saved: ${m.label}`) });
               }}
               style={[styles.mood, data.todayLog?.mood === m.value && styles.moodSelected]}
             >
-              <Text style={{ fontSize: 28 }}>{m.emoji}</Text>
+              <ScaleIcon kind="mood" value={m.value} size={28} color={colors.ink} />
               <Text style={styles.moodLabel}>{m.label}</Text>
             </Pressable>
           ))}
         </View>
-        <TalkToLog onLogged={(summary) => flash(`Logged ${summary} ✅`)} />
+        <TalkToLog onLogged={(summary) => flash(`Logged ${summary}`)} />
         {toast && <Text style={styles.toast}>{toast}</Text>}
       </Card>
 
@@ -163,7 +166,7 @@ export default function Home() {
           style={styles.suggestion}
         >
           <Text style={{ fontSize: 26 }}>
-            {s.type === 'SCREENING' ? '🩺' : s.type === 'UPLOAD_LABS' ? '🧪' : s.type === 'DANGER_CHECK' ? '🚨' : s.type === 'LOG_BP' ? '💓' : s.type === 'VISIT_PREP' ? '📋' : '✍️'}
+            {s.type === 'SCREENING' ? '' : s.type === 'UPLOAD_LABS' ? '' : s.type === 'DANGER_CHECK' ? '' : s.type === 'LOG_BP' ? '' : s.type === 'VISIT_PREP' ? '' : ''}
           </Text>
           <View style={{ flex: 1 }}>
             <T variant="h3">{s.type === 'SCREENING' && s.screening ? `Take the ${SCREENINGS[s.screening].title}` : s.title}</T>
@@ -187,7 +190,7 @@ export default function Home() {
 
       {cycle && (
         <>
-          <SectionTitle eyebrow={`${cycle.guide.emoji} ${cycle.guide.vibe}`} title="Little things for this phase" />
+          <SectionTitle eyebrow={`${cycle.guide.vibe}`} title="Little things for this phase" />
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingRight: 18 }}>
             {cycle.guide.tips.map((tip) => (
               <Card key={tip.text} style={{ width: 240 }}>

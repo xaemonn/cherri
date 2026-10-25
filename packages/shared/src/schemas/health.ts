@@ -11,6 +11,7 @@ import {
 import { SYMPTOM_CODES } from '../catalog/symptoms';
 import { LAB_CODES } from '../catalog/labs';
 import { isoDateSchema, timeZoneSchema } from './common';
+import { pbacEntrySchema } from '../insights/pbac';
 
 const currentYear = new Date().getUTCFullYear();
 
@@ -72,6 +73,8 @@ export const upsertLogSchema = z
     systolic: z.number().int().min(60).max(260).nullable(),
     diastolic: z.number().int().min(30).max(160).nullable(),
     weightKg: z.number().min(25).max(250).nullable(),
+    /** Pictorial blood-loss chart for the day (pads, tampons, cup, clots, flooding). */
+    pbac: pbacEntrySchema.nullable(),
     notes: z.string().max(2000).nullable(),
     /** Replaces the day's symptom list. */
     symptoms: z.array(symptomEntrySchema).max(40),

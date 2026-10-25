@@ -122,6 +122,25 @@ export function toFhirBundle(report: DoctorReport): FhirBundle {
     });
   }
 
+  if (report.bloodLoss) {
+    add({
+      resourceType: 'Observation',
+      ...reported,
+      status: 'final',
+      category: category('survey'),
+      code: { text: 'Pictorial Blood Loss Assessment Chart (PBAC) score, one menstrual period' },
+      subject,
+      effectiveDateTime: report.bloodLoss.start,
+      valueInteger: report.bloodLoss.score,
+      note: [
+        {
+          text: `≈${report.bloodLoss.estimatedMl} mL; ${report.bloodLoss.clotsLarge} large and ${report.bloodLoss.clotsSmall} small clots; ${report.bloodLoss.flooding} flooding episodes. Over 100 indicates heavy menstrual bleeding.`,
+        },
+      ],
+      ...(report.bloodLoss.heavy && { interpretation: [{ coding: [{ system: INTERPRETATION, code: 'H' }] }] }),
+    });
+  }
+
   for (const check of report.mindChecks ?? []) {
     const definition = MIND_CHECKS[check.type];
     add({

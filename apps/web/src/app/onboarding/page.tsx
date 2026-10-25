@@ -15,18 +15,18 @@ import { useAuth } from '@/lib/auth';
 import { cn } from '@/lib/cn';
 
 const STAGES: Array<{ value: LifeStage; label: string; emoji: string }> = [
-  { value: 'CYCLE', label: 'Tracking my cycle', emoji: '🌙' },
-  { value: 'TTC', label: 'Trying to conceive', emoji: '🍼' },
-  { value: 'PREGNANCY', label: 'Pregnant', emoji: '🤰' },
-  { value: 'POSTPARTUM', label: 'Postpartum', emoji: '👶' },
-  { value: 'PERIMENOPAUSE', label: 'Perimenopause', emoji: '🌗' },
-  { value: 'MENOPAUSE', label: 'Menopause', emoji: '🌻' },
+  { value: 'CYCLE', label: 'Tracking my cycle', emoji: '' },
+  { value: 'TTC', label: 'Trying to conceive', emoji: '' },
+  { value: 'PREGNANCY', label: 'Pregnant', emoji: '' },
+  { value: 'POSTPARTUM', label: 'Postpartum', emoji: '' },
+  { value: 'PERIMENOPAUSE', label: 'Perimenopause', emoji: '' },
+  { value: 'MENOPAUSE', label: 'Menopause', emoji: '' },
 ];
 
 const TONES: Array<{ value: CompanionTone; label: string; emoji: string; sample: string }> = [
-  { value: 'BESTIE', label: 'Bestie', emoji: '💅', sample: '“Ugh cramps are the worst. Hot water bag + chai, let’s go.”' },
-  { value: 'BIG_SIS', label: 'Big sis', emoji: '🫶', sample: '“That sounds rough. Here’s what usually helps…”' },
-  { value: 'CLINICAL', label: 'Straight facts', emoji: '🩺', sample: '“Dysmenorrhoea is common. NSAIDs work best taken early.”' },
+  { value: 'BESTIE', label: 'Bestie', emoji: '', sample: '“Ugh cramps are the worst. Hot water bag + chai, let’s go.”' },
+  { value: 'BIG_SIS', label: 'Big sis', emoji: '', sample: '“That sounds rough. Here’s what usually helps…”' },
+  { value: 'CLINICAL', label: 'Straight facts', emoji: '', sample: '“Dysmenorrhoea is common. NSAIDs work best taken early.”' },
 ];
 
 const LANGUAGES: Array<{ value: Language; label: string }> = [
@@ -127,7 +127,7 @@ export default function OnboardingPage() {
 
   return (
     <div className="relative min-h-dvh overflow-hidden px-5 py-8">
-      <Blob className="absolute -top-24 -right-24 size-80 opacity-70" color="#A4B26B" />
+      <Blob className="absolute -top-24 -right-24 size-80 opacity-70" color="#D69AB5" />
       <Blob className="absolute -bottom-28 -left-24 size-96 opacity-60" color="#8FAAA3" variant={1} />
       <div className="relative mx-auto flex max-w-xl flex-col">
         <div className="mb-10 flex items-center justify-between">
@@ -158,7 +158,7 @@ export default function OnboardingPage() {
                         <Sparkles className="size-4" /> {busy === 'demo' ? 'Loading…' : 'Ananya: cycle tracking'}
                       </Button>
                       <Button variant="outline" size="sm" disabled={busy !== null} onClick={() => void loadDemo('meera')}>
-                        🤰 Meera: pregnancy
+                        Meera: pregnancy
                       </Button>
                     </div>
                   </div>
@@ -181,7 +181,6 @@ export default function OnboardingPage() {
                         form.lifeStage === s.value ? 'border-ink bg-olive shadow-lift' : 'border-line bg-paper hover:border-ink',
                       )}
                     >
-                      <span className="text-3xl">{s.emoji}</span>
                       {s.label}
                     </button>
                   ))}
@@ -209,7 +208,7 @@ export default function OnboardingPage() {
 
             {current === 'due' && (
               <>
-                <h1 className="text-4xl font-semibold sm:text-5xl">When is your baby due? 🤰</h1>
+                <h1 className="text-4xl font-semibold sm:text-5xl">When is your baby due?</h1>
                 <p className="mt-2 text-ink-soft">Your scan or doctor gives you this date. Cherri uses it for your weekly care plan and danger-sign checks.</p>
                 <Input
                   type="date"
@@ -232,7 +231,7 @@ export default function OnboardingPage() {
 
             {current === 'birth' && (
               <>
-                <h1 className="text-4xl font-semibold sm:text-5xl">When was your baby born? 👶</h1>
+                <h1 className="text-4xl font-semibold sm:text-5xl">When was your baby born?</h1>
                 <p className="mt-2 text-ink-soft">Cherri will walk you through the first six weeks: check-ups, danger signs and taking care of you too.</p>
                 <Input type="date" max={today} className="mt-6 h-14 text-lg" value={form.deliveryDate} onChange={(e) => setForm({ ...form, deliveryDate: e.target.value })} />
               </>
@@ -249,7 +248,6 @@ export default function OnboardingPage() {
                       onClick={() => setForm({ ...form, companionTone: t.value })}
                       className={cn('flex w-full items-start gap-4 rounded-3xl border p-4 text-left transition-all', form.companionTone === t.value ? 'border-ink bg-ochre shadow-lift' : 'border-line bg-paper hover:border-ink')}
                     >
-                      <span className="text-3xl">{t.emoji}</span>
                       <span>
                         <span className="block font-display text-lg font-semibold">{t.label}</span>
                         <span className="text-sm text-ink-soft">{t.sample}</span>
@@ -275,7 +273,7 @@ export default function OnboardingPage() {
 
             {current === 'consent' && (
               <>
-                <h1 className="text-4xl font-semibold sm:text-5xl">Your data, your rules 🔒</h1>
+                <h1 className="text-4xl font-semibold sm:text-5xl">Your data, your rules</h1>
                 <ul className="mt-6 space-y-3 text-[15px]">
                   {[
                     'Your notes and chats are encrypted before they are stored.',
@@ -284,13 +282,13 @@ export default function OnboardingPage() {
                     'Export or permanently delete everything from Settings, anytime.',
                   ].map((line) => (
                     <li key={line} className="flex gap-3 rounded-2xl bg-paper p-3">
-                      <span>✅</span>
+                      <span></span>
                       {line}
                     </li>
                   ))}
                 </ul>
                 <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-3xl border border-ink/10 bg-olive-soft p-4">
-                  <input type="checkbox" className="mt-1 size-5 accent-[#33261C]" checked={form.consent} onChange={(e) => setForm({ ...form, consent: e.target.checked })} />
+                  <input type="checkbox" className="mt-1 size-5 accent-[#2E2230]" checked={form.consent} onChange={(e) => setForm({ ...form, consent: e.target.checked })} />
                   <span className="text-sm font-semibold">
                     I agree that Cherri can store my health data securely to give me insights. Cherri gives information, not a diagnosis.
                   </span>

@@ -53,7 +53,7 @@ function Result({ record, onRetake }: { record: ScreeningRecord; onRetake: () =>
             <ul className="mt-3 space-y-2 text-sm">
               {result.suggestedTests.map((t) => (
                 <li key={t} className="flex gap-2">
-                  <span>🧪</span>
+                  <span></span>
                   {t}
                 </li>
               ))}

@@ -9,6 +9,7 @@ import {
   type ISODate,
   type LabRecord,
   type LogRecord,
+  type PbacEntry,
   type PeriodRecord,
 } from '@cherri/shared';
 import { PrismaService } from '../common/prisma.service';
@@ -49,6 +50,7 @@ export class HealthDataService {
       systolic: l.systolic,
       diastolic: l.diastolic,
       weightKg: l.weightKg,
+      pbac: (l.pbac as PbacEntry | null) ?? null,
       symptoms: l.symptoms,
     }));
   }

@@ -3,6 +3,7 @@ import type { RawLabResult } from './catalog/labs';
 import type { SymptomCode } from './catalog/symptoms';
 import { addDays, diffDays, type ISODate } from './dates';
 import type { PeriodRecord } from './cycle/phases';
+import type { PbacEntry } from './insights/pbac';
 import type { LogRecord } from './insights/types';
 import { PREGNANCY_DAYS } from './pregnancy/care';
 import type { MedicationInput } from './schemas/visit';
@@ -135,9 +136,20 @@ export function generateDemoData(today: ISODate, seed = 21): DemoData {
     if (chance(0.2)) add('hair_loss', 1);
     if (chance(0.15)) add('dizziness', 1);
 
+    // She started using the blood-loss chart for her last two periods.
+    const pbac: PbacEntry | null =
+      onPeriod && cycleIndex >= starts.length - 2
+        ? day === 1
+          ? { padsModerate: 2, padsLight: 1 }
+          : day <= 4
+            ? { padsSoaked: 1, padsModerate: 3, clotsSmall: 1, clotsLarge: day === 2 ? 1 : 0 }
+            : { padsLight: day === 5 ? 3 : 1 }
+        : null;
+
     logs.push({
       date,
       flow,
+      pbac,
       mood,
       energy,
       stress: premenstrual ? pick(3, 5) : pick(2, 3),

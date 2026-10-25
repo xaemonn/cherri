@@ -40,7 +40,7 @@ export default function ReportPage() {
       setCreated(share);
       void queryClient.invalidateQueries({ queryKey: keys.shares });
     } catch (error) {
-      toast(error instanceof Error ? error.message : 'Could not create link.', '😕');
+      toast(error instanceof Error ? error.message : 'Could not create link.');
     } finally {
       setCreating(false);
     }
@@ -53,7 +53,7 @@ export default function ReportPage() {
       </PageHeader>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
-        <div className="order-2 lg:order-1">
+        <div className="scrollbar-thin order-2 rounded-card lg:order-1 lg:max-h-[calc(100dvh-10rem)] lg:overflow-y-auto print:max-h-none print:overflow-visible">
           {preview.isLoading ? <PageLoader label="Building your report…" /> : preview.error || !preview.data ? <ErrorNote error={preview.error} /> : <DoctorReportView report={preview.data} />}
         </div>
 
@@ -72,7 +72,7 @@ export default function ReportPage() {
               </Select>
             </label>
             <label className="mt-3 flex items-center gap-2 text-sm font-semibold">
-              <input type="checkbox" className="size-4 accent-[#33261C]" checked={singleView} onChange={(e) => setSingleView(e.target.checked)} />
+              <input type="checkbox" className="size-4 accent-[#2E2230]" checked={singleView} onChange={(e) => setSingleView(e.target.checked)} />
               Allow only one view
             </label>
             <Button className="mt-4 w-full" onClick={() => void createLink()} disabled={creating}>
@@ -115,7 +115,7 @@ export default function ReportPage() {
               try {
                 downloadJson(`cherri-fhir-${new Date().toISOString().slice(0, 10)}.json`, await api.reports.fhir(180), 'application/fhir+json');
               } catch (error) {
-                toast(error instanceof Error ? error.message : 'Could not export.', '😕');
+                toast(error instanceof Error ? error.message : 'Could not export.');
               }
             }}
           >
@@ -144,7 +144,7 @@ export default function ReportPage() {
                         onClick={async () => {
                           await api.reports.revoke(s.id);
                           void queryClient.invalidateQueries({ queryKey: keys.shares });
-                          toast('Link turned off', '🔒');
+                          toast('Link turned off');
                         }}
                       >
                         Turn off

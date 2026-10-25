@@ -7,18 +7,25 @@ import {
   FLOW_LEVELS,
   flowStyles,
   formatDay,
+  isEmptyPbac,
+  pbacDayScore,
   moodScale,
   symptomCategoriesFor,
   SYMPTOMS,
   todayIn,
   type BloodPressureLevel,
   type FlowLevel,
+  type PbacEntry,
   type SymptomCategory,
   type SymptomCode,
 } from '@cherri/shared';
 import confetti from 'canvas-confetti';
 import { motion } from 'motion/react';
 import { useEffect, useMemo, useState } from 'react';
+import { Droplets, HeartPulse, ListChecks, Sun } from 'lucide-react';
+import { PbacCard } from '@/components/log/pbac-card';
+import { Tabs } from '@/components/ui/tabs';
+import { ScaleIcon } from '@/components/ui/scale-icon';
 import { TalkToLog } from '@/components/log/talk-to-log';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -41,7 +48,7 @@ const CATEGORY_LABELS: Record<SymptomCategory, string> = {
   PREGNANCY: 'Pregnancy signs',
 };
 
-const PAIN_FACES = ['😌', '😌', '🙂', '😕', '😣', '😣', '😖', '😖', '😫', '😭', '😭'];
+const PAIN_FACES = ['', '', '', '', '', '', '', '', '', '', ''];
 
 const BP_LABELS: Record<BloodPressureLevel, { label: string; className: string }> = {
   NORMAL: { label: 'In the healthy range', className: 'bg-olive-soft text-olive-deep' },
@@ -62,6 +69,7 @@ interface FormState {
   weightKg: string;
   symptoms: Map<SymptomCode, number>;
   notes: string;
+  pbac: PbacEntry;
 }
 
 const EMPTY: FormState = {
@@ -75,22 +83,24 @@ const EMPTY: FormState = {
   weightKg: '',
   symptoms: new Map(),
   notes: '',
+  pbac: {},
 };
 
 const numberOrNull = (value: string) => (value.trim() === '' ? null : Number(value));
 
 function celebrate() {
-  void confetti({ particleCount: 70, spread: 70, origin: { y: 0.8 }, colors: ['#A4B26B', '#D9AA55', '#8FAAA3', '#C48A5A', '#A8432C'] });
+  void confetti({ particleCount: 70, spread: 70, origin: { y: 0.8 }, colors: ['#D69AB5', '#D9AA55', '#8FAAA3', '#C48A5A', '#A8432C'] });
 }
 
 export default function LogPage() {
   const { user } = useAuth();
   const today = useMemo(() => todayIn(user?.timezone ?? 'Asia/Kolkata'), [user?.timezone]);
   const [date, setDate] = useState(today);
-  const { data, isLoading } = useLog(date);
+  const { data, isLoading, dataUpdatedAt } = useLog(date);
   const save = useSaveLog(date);
   const toast = useToast();
   const [form, setForm] = useState<FormState>(EMPTY);
+  const [tab, setTab] = useState<'today' | 'bleeding' | 'symptoms' | 'vitals'>('today');
 
   useEffect(() => {
     const log = data?.log;
@@ -107,6 +117,7 @@ export default function LogPage() {
             weightKg: log.weightKg?.toString() ?? '',
             symptoms: new Map(log.symptoms.map((s) => [s.code as SymptomCode, s.severity])),
             notes: log.notes ?? '',
+            pbac: log.pbac ?? {},
           }
         : EMPTY,
     );
@@ -135,7 +146,7 @@ export default function LogPage() {
 
   function submit() {
     if ((systolic === null) !== (diastolic === null)) {
-      toast('Add both blood pressure numbers, like 120 / 80.', '🩺');
+      toast('Add both blood pressure numbers, like 120 / 80.');
       return;
     }
     save.mutate(
@@ -149,14 +160,15 @@ export default function LogPage() {
         diastolic,
         weightKg: numberOrNull(form.weightKg),
         notes: form.notes.trim() || null,
+        pbac: isEmptyPbac(form.pbac) ? null : form.pbac,
         symptoms: [...form.symptoms.entries()].map(([code, severity]) => ({ code, severity })),
       },
       {
         onSuccess: () => {
           celebrate();
-          toast(date === today ? 'Today is logged. Proud of you!' : `Saved ${formatDay(date)}`, '🍒');
+          toast(date === today ? 'Today is logged. Proud of you!' : `Saved ${formatDay(date)}`);
         },
-        onError: (error) => toast(error.message, '😕'),
+        onError: (error) => toast(error.message),
       },
     );
   }
@@ -191,13 +203,27 @@ export default function LogPage() {
           <Spinner />
         </div>
       ) : (
+        <>
+        <Tabs
+          className="mb-5"
+          value={tab}
+          onChange={setTab}
+          tabs={[
+            { id: 'today', label: 'Today', icon: Sun },
+            { id: 'bleeding', label: 'Blood loss', icon: Droplets, badge: form.pbac && !isEmptyPbac(form.pbac) ? pbacDayScore(form.pbac) : null },
+            { id: 'symptoms', label: 'Symptoms', icon: ListChecks, badge: form.symptoms.size || null },
+            { id: 'vitals', label: 'Vitals', icon: HeartPulse },
+          ]}
+        />
         <div className="grid gap-5 lg:grid-cols-2">
+          {tab === 'today' && (
+          <>
           <Card tone="cherry">
             <h2 className="text-xl font-semibold">Period flow</h2>
             <div className="mt-4 flex flex-wrap gap-2">
               {FLOW_LEVELS.map((flow) => (
                 <Chip key={flow} selected={form.flow === flow} onClick={() => setForm({ ...form, flow: form.flow === flow ? null : flow })}>
-                  {flow === 'NONE' ? '🚫' : '🩸'.repeat(Math.max(1, flowStyles[flow].drops))} {flowStyles[flow].label}
+                  {flow === 'NONE' ? '' : ''.repeat(Math.max(1, flowStyles[flow].drops))} {flowStyles[flow].label}
                 </Chip>
               ))}
             </div>
@@ -227,12 +253,25 @@ export default function LogPage() {
               <span>Worst ever</span>
             </div>
           </Card>
+          </>
+          )}
 
+          {tab === 'bleeding' && (
+          <PbacCard
+            key={`${date}-${dataUpdatedAt}`}
+            value={form.pbac}
+            onChange={(pbac) => setForm((f) => ({ ...f, pbac }))}
+            defaultOpen
+          />
+          )}
+
+          {tab === 'today' && (
+          <>
           <Card tone="dusk">
             <h2 className="text-xl font-semibold">Mood</h2>
-            <ScaleRow items={moodScale} value={form.mood} onChange={(mood) => setForm({ ...form, mood })} />
+            <ScaleRow kind="mood" items={moodScale} value={form.mood} onChange={(mood) => setForm({ ...form, mood })} />
             <h2 className="mt-5 text-xl font-semibold">Energy</h2>
-            <ScaleRow items={energyScale} value={form.energy} onChange={(energy) => setForm({ ...form, energy })} />
+            <ScaleRow kind="energy" items={energyScale} value={form.energy} onChange={(energy) => setForm({ ...form, energy })} />
           </Card>
 
           <Card tone="sage">
@@ -256,7 +295,10 @@ export default function LogPage() {
               maxLength={2000}
             />
           </Card>
+          </>
+          )}
 
+          {tab === 'vitals' && (
           <Card tone={caresAboutVitals ? 'ochre' : 'paper'} className="lg:col-span-2">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <h2 className="text-xl font-semibold">Vitals</h2>
@@ -318,7 +360,9 @@ export default function LogPage() {
               )}
             </div>
           </Card>
+          )}
 
+          {tab === 'symptoms' && (
           <Card className="lg:col-span-2">
             <h2 className="text-xl font-semibold">Symptoms</h2>
             <p className="text-sm text-ink-soft">Tap to add. Tap the dots to set how strong it was.</p>
@@ -331,7 +375,7 @@ export default function LogPage() {
                       const severity = form.symptoms.get(s.code);
                       return (
                         <span key={s.code} className="inline-flex items-center gap-1">
-                          <Chip emoji={s.emoji} selected={severity !== undefined} onClick={() => toggleSymptom(s.code)}>
+                          <Chip selected={severity !== undefined} onClick={() => toggleSymptom(s.code)}>
                             {s.label}
                           </Chip>
                           {severity !== undefined && (
@@ -357,7 +401,9 @@ export default function LogPage() {
               ))}
             </div>
           </Card>
+          )}
         </div>
+        </>
       )}
 
       <div className="sticky bottom-24 z-30 mt-8 flex justify-end lg:bottom-6">
@@ -371,10 +417,12 @@ export default function LogPage() {
 
 function ScaleRow({
   items,
+  kind,
   value,
   onChange,
 }: {
-  items: ReadonlyArray<{ value: number; emoji: string; label: string }>;
+  items: ReadonlyArray<{ value: number; label: string }>;
+  kind: 'mood' | 'energy';
   value: number | null;
   onChange: (value: number | null) => void;
 }) {
@@ -389,7 +437,7 @@ function ScaleRow({
           aria-pressed={value === item.value}
           className={cn('flex flex-1 flex-col items-center rounded-2xl py-2 text-[11px] font-bold', value === item.value ? 'bg-paper shadow-lift ring-2 ring-ink' : 'hover:bg-paper/60')}
         >
-          <span className="text-2xl">{item.emoji}</span>
+          <ScaleIcon kind={kind} value={item.value} className="size-7" />
           {item.label}
         </motion.button>
       ))}

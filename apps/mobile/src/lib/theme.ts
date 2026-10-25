@@ -4,8 +4,8 @@ export { colors };
 
 /** Loaded in the root layout from @expo-google-fonts. */
 export const fonts = {
-  display: 'BricolageGrotesque_800ExtraBold',
-  displayBold: 'BricolageGrotesque_700Bold',
+  display: 'Figtree_700Bold',
+  displayBold: 'Figtree_600SemiBold',
   body: 'Figtree_400Regular',
   medium: 'Figtree_500Medium',
   semibold: 'Figtree_600SemiBold',
@@ -18,12 +18,12 @@ export const radius = { md: 18, lg: 24, card: 28, pill: 999 } as const;
 export const tones = {
   paper: { bg: colors.paper, border: colors.line },
   cream: { bg: colors.creamDeep, border: colors.line },
-  matcha: { bg: '#E6F3C8', border: '#CFE39B' },
-  sunshine: { bg: '#FFEFC2', border: '#F6DC8F' },
-  periwinkle: { bg: '#E1E4FF', border: '#C6CCFF' },
-  tangerine: { bg: '#FFE7C2', border: '#F8CF98' },
-  sage: { bg: '#DCEFE0', border: '#BCDCC2' },
-  apricot: { bg: '#FFE2C6', border: '#F6C99E' },
+  matcha: { bg: '#F8E6EE', border: '#EDC9D8' },
+  sunshine: { bg: '#F8EED8', border: '#EBD9AE' },
+  periwinkle: { bg: '#EFEBFA', border: '#D9D1F2' },
+  tangerine: { bg: '#FBEBE2', border: '#F1D2C0' },
+  sage: { bg: '#E6F2EC', border: '#C9E2D6' },
+  apricot: { bg: '#FBE4E7', border: '#F2C6CD' },
   ink: { bg: colors.ink, border: colors.ink },
 } as const;
 

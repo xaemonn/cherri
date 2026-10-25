@@ -1,44 +1,44 @@
 @import "tailwindcss";
 
-/* Cherri design tokens: boho grove. Olive, sage, cocoa and cream. Mirrors packages/shared/src/design/tokens.ts. No pink, ever. */
+/* Cherri design tokens: berry, blush, lavender and gold on a warm white. */
 @theme {
-  --color-cream: #f3ebdd;
-  --color-cream-deep: #e8dcc6;
-  --color-paper: #fbf7ef;
-  --color-ink: #33261c;
-  --color-ink-soft: #6b5a4a;
-  --color-ink-faint: #a3927f;
-  --color-line: #e0d3bd;
+  --color-cream: #faf5f3;
+  --color-cream-deep: #f2e7e8;
+  --color-paper: #fffcfb;
+  --color-ink: #2e2230;
+  --color-ink-soft: #6e5a6b;
+  --color-ink-faint: #a897a6;
+  --color-line: #ecdde0;
 
-  --color-olive: #a4b26b;
-  --color-olive-soft: #e6e9d3;
-  --color-olive-deep: #4a5a2b;
-  --color-forest: #2f3a24;
-  --color-clay: #c48a5a;
-  --color-clay-soft: #f0e0cc;
-  --color-clay-deep: #74461f;
-  --color-ochre: #d9aa55;
-  --color-ochre-soft: #f3e6c6;
-  --color-ochre-deep: #6b4f12;
-  --color-dusk: #8faaa3;
-  --color-dusk-soft: #dfe7e3;
-  --color-dusk-deep: #354f49;
-  --color-sage: #a8b595;
-  --color-sage-soft: #e6eadd;
-  --color-sage-deep: #3f5038;
-  --color-cherry: #a8432c;
-  --color-cherry-soft: #f1dfc8; /* sand: a light red tint would read pink */
-  --color-cherry-deep: #6b2416;
+  --color-olive: #d69ab5;
+  --color-olive-soft: #f8e6ee;
+  --color-olive-deep: #8a3e66;
+  --color-forest: #4a2340;
+  --color-clay: #e3a487;
+  --color-clay-soft: #fbebe2;
+  --color-clay-deep: #8a4b30;
+  --color-ochre: #d4a65a;
+  --color-ochre-soft: #f8eed8;
+  --color-ochre-deep: #7a5a1e;
+  --color-dusk: #a99bd6;
+  --color-dusk-soft: #efebfa;
+  --color-dusk-deep: #4f4486;
+  --color-sage: #9cc5b4;
+  --color-sage-soft: #e6f2ec;
+  --color-sage-deep: #2f5e4e;
+  --color-cherry: #b4354a;
+  --color-cherry-soft: #fbe4e7; /* sand: a light red tint would read pink */
+  --color-cherry-deep: #7a1e2e;
 
-  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
-  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
   --radius-card: 26px;
   --radius-arch: 999px 999px 26px 26px;
 
-  --shadow-lift: 0 1px 2px rgb(51 38 28 / 0.05), 0 8px 20px -12px rgb(51 38 28 / 0.22);
-  --shadow-lift-lg: 0 2px 4px rgb(51 38 28 / 0.04), 0 22px 44px -24px rgb(51 38 28 / 0.35);
-  --shadow-soft: 0 18px 40px -26px rgb(51 38 28 / 0.3);
+  --shadow-lift: 0 1px 2px rgb(46 34 48 / 0.05), 0 8px 20px -12px rgb(46 34 48 / 0.22);
+  --shadow-lift-lg: 0 2px 4px rgb(46 34 48 / 0.04), 0 22px 44px -24px rgb(46 34 48 / 0.35);
+  --shadow-soft: 0 18px 40px -26px rgb(46 34 48 / 0.3);
 
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
 
@@ -109,12 +109,7 @@
 
   h1, h2, h3, h4 {
     font-family: var(--font-display);
-    font-variation-settings: "SOFT" 100, "WONK" 0;
-    letter-spacing: -0.015em;
-  }
-
-  .font-display {
-    font-variation-settings: "SOFT" 100, "WONK" 0;
+    letter-spacing: -0.02em;
   }
 
   ::selection {
@@ -155,10 +150,9 @@
   .scrollbar-none::-webkit-scrollbar {
     display: none;
   }
-  /* Italic, wonky Fraunces for the one emphasised word in a headline. */
+  /* The one emphasised phrase in a headline: colour only, no italics. */
   .accent-italic {
-    font-style: italic;
-    font-variation-settings: "SOFT" 100, "WONK" 1;
+    font-style: normal;
   }
   .rounded-arch {
     border-radius: var(--radius-arch);
@@ -206,17 +200,6 @@ html.scroller-custom::-webkit-scrollbar {
   display: none;
 }
 
-/* Custom cursor: hide the system arrow, keep the text caret where people type. */
-html.cursor-custom,
-html.cursor-custom * {
-  cursor: none !important;
-}
-html.cursor-custom input,
-html.cursor-custom textarea,
-html.cursor-custom select,
-html.cursor-custom [contenteditable="true"] {
-  cursor: text !important;
-}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -229,4 +212,42 @@ html.cursor-custom [contenteditable="true"] {
 @media print {
   body::before { display: none; }
   html, body { background: white; }
+}
+
+/* Screen shield: one attribute flip hides the whole app and shows the decoy in the same frame. */
+.shield-layer {
+  display: none;
+}
+html[data-shield="on"] body > :not(.shield-layer) {
+  display: none !important;
+}
+html[data-shield="on"] body::before {
+  display: none;
+}
+html[data-shield="on"] .shield-layer {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 2147483647;
+  overflow-y: auto;
+  background: #fff;
+}
+
+/* Something new just appeared: a short ring pulse so it can't be mistaken for old content. */
+@keyframes attention {
+  0% { box-shadow: 0 0 0 0 var(--attention, rgb(74 90 43 / 0.55)); }
+  70% { box-shadow: 0 0 0 14px rgb(0 0 0 / 0); }
+  100% { box-shadow: 0 0 0 0 rgb(0 0 0 / 0); }
+}
+.animate-attention {
+  animation: attention 1.1s ease-out 3;
+}
+@keyframes badge-fade {
+  0%, 80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
 }

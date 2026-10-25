@@ -24,12 +24,12 @@ export function TalkToLog({ className, date }: { className?: string; date?: stri
     setSaving(true);
     try {
       const result = await api.ai.parseLog({ text: input, commit: true, source, ...(date && { date }) });
-      if (!result.summary) toast('Saved your note. Add a symptom or feeling to log more.', '📝');
-      else toast(`Logged ${result.summary}`, '✅');
+      if (!result.summary) toast('Saved your note. Add a symptom or feeling to log more.');
+      else toast(`Logged ${result.summary}`);
       setText('');
       await invalidate();
     } catch (error) {
-      toast(error instanceof Error ? error.message : 'Could not save that.', '😕');
+      toast(error instanceof Error ? error.message : 'Could not save that.');
     } finally {
       setSaving(false);
     }
@@ -42,10 +42,10 @@ export function TalkToLog({ className, date }: { className?: string; date?: stri
         setText(transcript);
         await save(transcript, 'VOICE');
       } catch (error) {
-        toast(error instanceof Error ? error.message : 'Could not hear that.', '🎙️');
+        toast(error instanceof Error ? error.message : 'Could not hear that.');
       }
     } else {
-      voice.start().catch(() => toast('Microphone access is blocked.', '🎙️'));
+      voice.start().catch(() => toast('Microphone access is blocked.'));
     }
   }
 

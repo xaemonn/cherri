@@ -21,9 +21,9 @@ import { useInvalidateHealth } from '@/lib/queries';
 
 /** Word, shape and colour together, so the result reads in greyscale or for colour-blind eyes (as in Maitri). */
 const LEVEL_STYLE: Record<DangerLevel, { shape: string; className: string }> = {
-  RED: { shape: '🛑', className: 'bg-cherry text-cream' },
-  AMBER: { shape: '⚠️', className: 'bg-ochre-soft text-ochre-deep border border-ochre/40' },
-  GREEN: { shape: '🟢', className: 'bg-olive-soft text-olive-deep' },
+  RED: { shape: '', className: 'bg-cherry text-cream' },
+  AMBER: { shape: '', className: 'bg-ochre-soft text-ochre-deep border border-ochre/40' },
+  GREEN: { shape: '', className: 'bg-olive-soft text-olive-deep' },
 };
 
 const ANSWERS: Array<{ value: DangerAnswer; label: string }> = [
@@ -76,9 +76,9 @@ export function DangerCheck({ stage, weeks }: { stage: DangerStage; weeks: numbe
       for (const code of loggable) symptoms.set(code, Math.max(2, symptoms.get(code) ?? 0));
       await api.logs.upsert(today, { symptoms: [...symptoms.entries()].map(([code, severity]) => ({ code: code as SymptomCode, severity })) });
       await invalidate();
-      toast('Added to today’s log and your doctor report', '📝');
+      toast('Added to today’s log and your doctor report');
     } catch (error) {
-      toast(error instanceof Error ? error.message : 'Could not save.', '😕');
+      toast(error instanceof Error ? error.message : 'Could not save.');
     } finally {
       setSaving(false);
     }

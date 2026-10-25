@@ -32,7 +32,7 @@ function Sparkline({ trend }: { trend: LabTrend }) {
         {last.value} <span className="text-sm font-semibold text-ink-soft">{last.unit ?? trend.unit}</span>
       </p>
       <svg viewBox="0 0 100 40" className="mt-2 h-10 w-full" preserveAspectRatio="none" aria-hidden="true">
-        <polyline points={points} fill="none" stroke="#33261C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+        <polyline points={points} fill="none" stroke="#2E2230" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
       </svg>
       <p className="text-[11px] text-ink-faint">
         {trend.points.length} results since {formatDay(trend.points[0]!.takenAt, { year: true })}
@@ -124,7 +124,7 @@ export default function LabsPage() {
       const form = new FormData();
       form.append('file', file, name);
       const report = await api.labs.upload(form);
-      toast(`Decoded ${report.results.length} results`, '🧪');
+      toast(`Decoded ${report.results.length} results`);
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: keys.labs }),
         queryClient.invalidateQueries({ queryKey: keys.labTrends }),
@@ -238,7 +238,7 @@ export default function LabsPage() {
             ))}
           </div>
         ) : (
-          <EmptyState emoji="🧪" title="No reports yet">
+          <EmptyState title="No reports yet">
             Upload your latest blood test, or try the sample to see how it works.
           </EmptyState>
         )}

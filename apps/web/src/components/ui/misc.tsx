@@ -35,18 +35,15 @@ export function PageLoader({ label = 'Loading…' }: { label?: string }) {
     <div className="grid min-h-[50vh] place-items-center">
       <div className="flex flex-col items-center gap-4 text-ink-soft">
         <BohoLoader />
-        <span className="font-display text-lg italic">{label}</span>
+        <span className="font-display text-lg">{label}</span>
       </div>
     </div>
   );
 }
 
-export function EmptyState({ emoji, title, children }: { emoji: string; title: string; children?: React.ReactNode }) {
+export function EmptyState({ title, children }: { title: string; children?: React.ReactNode }) {
   return (
     <div className="flex flex-col items-center gap-3 rounded-card border border-dashed border-ink/20 bg-paper/60 px-6 py-10 text-center">
-      <span className="text-4xl" aria-hidden="true">
-        {emoji}
-      </span>
       <h3 className="text-lg font-medium">{title}</h3>
       {children && <div className="max-w-sm text-sm text-ink-soft">{children}</div>}
     </div>
@@ -55,10 +52,10 @@ export function EmptyState({ emoji, title, children }: { emoji: string; title: s
 
 export function PageHeader({ eyebrow, title, children }: { eyebrow?: string; title: string; children?: React.ReactNode }) {
   return (
-    <header className="mb-6 animate-rise sm:mb-8">
+    <header className="mb-8 animate-rise sm:mb-10">
       {eyebrow && <p className="mb-2 text-xs font-semibold tracking-[0.22em] text-olive-deep uppercase">{eyebrow}</p>}
-      <h1 className="text-4xl leading-[1] font-medium text-balance sm:text-5xl">{title}</h1>
-      {children && <div className="mt-3 max-w-2xl text-[15px] text-ink-soft sm:text-base">{children}</div>}
+      <h1 className="text-3xl leading-tight font-semibold text-balance sm:text-4xl">{title}</h1>
+      {children && <div className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink-soft">{children}</div>}
     </header>
   );
 }

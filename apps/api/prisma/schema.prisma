@@ -73,6 +73,36 @@ enum ChatRole {
   ASSISTANT
 }
 
+enum Role {
+  PATIENT
+  DOCTOR
+}
+
+enum DoctorSpecialty {
+  GYNAECOLOGIST
+  OBSTETRICIAN
+  ENDOCRINOLOGIST
+}
+
+enum ConsultCategory {
+  LAB_REVIEW
+  MEDICATION_SIDE_EFFECTS
+  PERIOD_IRREGULARITY
+  GENERAL_SYMPTOMS
+}
+
+enum ConsultStatus {
+  AWAITING_REVIEW
+  IN_CONSULTATION
+  RESOLVED
+}
+
+enum ConsultSender {
+  PATIENT
+  DOCTOR
+  SYSTEM
+}
+
 model User {
   id              String        @id @default(cuid())
   email           String?       @unique
@@ -95,6 +125,9 @@ model User {
   familyHistory   String[]
   allergies       String? /// (encrypted)
   surgeries       String? /// (encrypted)
+  role            Role          @default(PATIENT)
+  /// argon2 hash of the 4-digit privacy PIN that locks the app after a quick exit.
+  pinHash         String?
   onboardedAt     DateTime?
   consentAt       DateTime?
   createdAt       DateTime      @default(now())
@@ -112,6 +145,72 @@ model User {
   story           SymptomStory?
   trustedContacts TrustedContact[]
   mindChecks      MindCheck[]
+  reminders       Reminder[]
+  doctorProfile   DoctorProfile?
+  consultations   Consultation[]  @relation("PatientConsultations")
+  doctorConsults  Consultation[]  @relation("DoctorConsultations")
+}
+
+/// A verified women's health doctor who answers consults. Verification is done by the Cherri team, not self-declared.
+model DoctorProfile {
+  id             String          @id @default(cuid())
+  userId         String          @unique
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String
+  specialty      DoctorSpecialty
+  registrationNo String
+  verified       Boolean         @default(false)
+  createdAt      DateTime        @default(now())
+}
+
+/// A non-urgent question to a doctor, with the clinical snapshot she agreed to share.
+model Consultation {
+  id                String          @id @default(cuid())
+  patientId         String
+  patient           User            @relation("PatientConsultations", fields: [patientId], references: [id], onDelete: Cascade)
+  doctorId          String?
+  doctor            User?           @relation("DoctorConsultations", fields: [doctorId], references: [id], onDelete: SetNull)
+  category          ConsultCategory
+  status            ConsultStatus   @default(AWAITING_REVIEW)
+  tags              String[]
+  snapshot          String /// (encrypted) ClinicalSnapshot JSON frozen when she consented
+  consentAt         DateTime
+  emergencyAt       DateTime?
+  frozen            Boolean         @default(false)
+  inPersonAdvisedAt DateTime?
+  resolvedAt        DateTime?
+  messages          ConsultMessage[]
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([patientId, updatedAt])
+  @@index([status, updatedAt])
+}
+
+model ConsultMessage {
+  id             String        @id @default(cuid())
+  consultationId String
+  consultation   Consultation  @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  sender         ConsultSender
+  kind           String        @default("TEXT") /// TEXT | VOICE | TESTS | IN_PERSON | RESOLVED | EMERGENCY
+  body           String /// (encrypted)
+  tests          String[]
+  createdAt      DateTime      @default(now())
+
+  @@index([consultationId, createdAt])
+}
+
+/// A discreet reminder, e.g. when to take a pregnancy test after emergency contraception.
+model Reminder {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind        String /// PREGNANCY_TEST
+  dueOn       DateTime  @db.Date
+  dismissedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([userId, dueOn])
 }
 
 /// One row per refresh token. Rotation links tokens through `familyId`; reuse of a
@@ -160,6 +259,8 @@ model DailyLog {
   systolic   Int?
   diastolic  Int?
   weightKg   Float?
+  /// Pictorial blood-loss chart for the day (pads, tampons, cup, clots, flooding).
+  pbac       Json?
   notes      String? /// (encrypted)
   source     LogSource      @default(MANUAL)
   symptoms   SymptomEntry[]

@@ -40,21 +40,21 @@ function ActionCard({ action }: { action: ChatAction }) {
   if (action.kind === 'LOGGED') {
     return (
       <Link href="/log" className="inline-flex items-center gap-2 rounded-full bg-olive-soft px-3 py-1.5 text-xs font-bold text-olive-deep">
-        ✅ Logged {action.summary}
+        Logged {action.summary}
       </Link>
     );
   }
   if (action.kind === 'SHOW_CYCLE') {
     return (
       <Link href="/cycle" className="inline-flex items-center gap-2 rounded-full bg-dusk-soft px-3 py-1.5 text-xs font-bold text-dusk-deep">
-        🌙 Open your cycle calendar
+        Open your cycle calendar
       </Link>
     );
   }
   const screening = SCREENINGS[action.screening as ScreeningType];
   return (
     <Link href={`/checks/${action.screening}`} className="flex items-center gap-3 rounded-2xl border border-ink/10 bg-ochre px-4 py-3 shadow-lift">
-      <span className="text-2xl">🩺</span>
+      <span className="text-2xl"></span>
       <span className="text-sm">
         <span className="block font-display font-semibold">Take the {screening?.title ?? 'health check'}</span>
         {action.reason}
@@ -66,12 +66,12 @@ function ActionCard({ action }: { action: ChatAction }) {
 function SafetyCard({ safety }: { safety: ChatSafety }) {
   return (
     <div className="rounded-3xl border border-cherry bg-cherry-soft p-4 text-cherry-deep">
-      <p className="font-display text-lg font-semibold">You’re not alone 💛</p>
+      <p className="font-display text-lg font-semibold">You’re not alone</p>
       <p className="mt-1 text-sm">{safety.message}</p>
       <div className="mt-3 flex flex-wrap gap-2">
         {safety.helplines.map((h) => (
           <a key={h.number} href={`tel:${h.number}`} className="rounded-full bg-cherry px-4 py-2 text-sm font-semibold text-white">
-            📞 {h.name} · {h.number}
+            {h.name} · {h.number}
           </a>
         ))}
       </div>
@@ -205,10 +205,10 @@ export default function ChatPage() {
       try {
         await send(await voice.stop(voiceLanguageFor(user?.language)));
       } catch (error) {
-        toast(error instanceof Error ? error.message : 'Could not hear that.', '🎙️');
+        toast(error instanceof Error ? error.message : 'Could not hear that.');
       }
     } else {
-      voice.start().catch(() => toast('Microphone access is blocked.', '🎙️'));
+      voice.start().catch(() => toast('Microphone access is blocked.'));
     }
   }
 

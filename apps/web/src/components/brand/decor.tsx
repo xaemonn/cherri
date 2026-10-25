@@ -9,7 +9,7 @@ const BLOBS = [
 ];
 
 /** Soft organic shape behind illustrations. */
-export function Blob({ className, color = '#E6E9D3', variant = 0 }: { className?: string; color?: string; variant?: 0 | 1 | 2 }) {
+export function Blob({ className, color = '#F8E6EE', variant = 0 }: { className?: string; color?: string; variant?: 0 | 1 | 2 }) {
   return (
     <svg viewBox="-80 -80 160 160" className={cn('pointer-events-none', className)} aria-hidden="true">
       <path d={BLOBS[variant]} fill={color} />
@@ -25,8 +25,8 @@ export function Sticker({
   children,
   className = 'relative size-28',
   textClassName = 'px-4 text-[12px]',
-  color = '#A4B26B',
-  textColor = '#33261C',
+  color = '#D69AB5',
+  textColor = '#2E2230',
   tilt = -10,
 }: {
   children: React.ReactNode;
@@ -119,7 +119,7 @@ export function CircleText({ text, className, children, color = 'currentColor' }
 }
 
 /** A single leaf, for floating decoration. */
-export function Leaf({ className, color = '#8E9F55', vein = '#C9D19A' }: { className?: string; color?: string; vein?: string }) {
+export function Leaf({ className, color = '#C27A9A', vein = '#C9D19A' }: { className?: string; color?: string; vein?: string }) {
   return (
     <svg viewBox="0 0 40 40" className={cn('pointer-events-none', className)} aria-hidden="true">
       <path d="M4 36C4 18 16 5 36 4c0 20-13 32-32 32Z" fill={color} />
@@ -129,7 +129,7 @@ export function Leaf({ className, color = '#8E9F55', vein = '#C9D19A' }: { class
 }
 
 /** A curved sprig with alternating leaves. */
-export function Sprig({ className, color = '#8E9F55' }: { className?: string; color?: string }) {
+export function Sprig({ className, color = '#C27A9A' }: { className?: string; color?: string }) {
   const leaves = [
     { x: 30, y: 78, r: -35 },
     { x: 44, y: 66, r: 30 },

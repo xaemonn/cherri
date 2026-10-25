@@ -1,4 +1,5 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import { hash, verify } from '@node-rs/argon2';
 import type { User } from '@prisma/client';
 import {
   addDays,
@@ -10,6 +11,8 @@ import {
   type HealthBackgroundInput,
   type ISODate,
   type OnboardingInput,
+  type PinInput,
+  type UnlockInput,
   type UpdateProfileInput,
 } from '@cherri/shared';
 import { AuditService } from '../common/audit.service';
@@ -86,6 +89,29 @@ export class UsersService {
     return toPublicUser(updated);
   }
 
+  /** The privacy PIN that locks Cherri after a quick exit. Stored only as an argon2 hash. */
+  async setPin(userId: string, input: PinInput): Promise<PublicUser> {
+    return toPublicUser(await this.prisma.user.update({ where: { id: userId }, data: { pinHash: await hash(input.pin) } }));
+  }
+
+  async removePin(userId: string): Promise<PublicUser> {
+    return toPublicUser(await this.prisma.user.update({ where: { id: userId }, data: { pinHash: null } }));
+  }
+
+  /** Unlock after a quick exit: the PIN if one is set, otherwise the account password. */
+  async unlock(userId: string, input: UnlockInput): Promise<{ ok: true }> {
+    const user = await this.data.getUser(userId);
+    const secret = user.pinHash ? input.pin : input.password;
+    const stored = user.pinHash ?? user.passwordHash;
+    // Guest accounts have neither: there is nothing to check against, so the lock is cosmetic.
+    if (!stored) return { ok: true };
+    // 403, not 401: a wrong PIN must not look like an expired session to the client.
+    if (!secret || !(await verify(stored, secret))) {
+      throw new ForbiddenException({ code: 'UNLOCK_FAILED', message: user.pinHash ? 'That PIN is not right.' : 'That password is not right.' });
+    }
+    return { ok: true };
+  }
+
   async background(userId: string): Promise<HealthBackground> {
     return this.toBackground(await this.data.getUser(userId));
   }
@@ -119,6 +145,8 @@ export class UsersService {
         story: true,
         trustedContacts: { orderBy: { createdAt: 'asc' } },
         mindChecks: { orderBy: { createdAt: 'asc' } },
+        consultations: { include: { messages: { orderBy: { createdAt: 'asc' } } }, orderBy: { createdAt: 'asc' } },
+        reminders: { orderBy: { createdAt: 'asc' } },
       },
     });
     await this.audit.record('DATA_EXPORTED', { userId, ip });
@@ -159,6 +187,14 @@ export class UsersService {
         title: s.title,
         messages: s.messages.map((m) => ({ role: m.role, content: this.crypto.decrypt(m.content), at: m.createdAt })),
       })),
+      consultations: user.consultations.map((c) => ({
+        category: c.category,
+        status: c.status,
+        createdAt: c.createdAt,
+        sharedSnapshot: this.crypto.decryptJson(c.snapshot),
+        messages: c.messages.map((m) => ({ sender: m.sender, kind: m.kind, body: this.crypto.decrypt(m.body), tests: m.tests, at: m.createdAt })),
+      })),
+      reminders: user.reminders.map((r) => ({ kind: r.kind, dueOn: fromUTCDate(r.dueOn), dismissedAt: r.dismissedAt })),
       shareLinks: user.shareLinks,
     };
   }

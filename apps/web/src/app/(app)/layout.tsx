@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
-import { useQuickExitShortcut } from '@/components/safety/quick-exit';
+import { QuickExitFab } from '@/components/safety/quick-exit';
 import { BottomNav, NavFallback, Sidebar } from '@/components/shell/nav';
 import { PageLoader } from '@/components/ui/misc';
 import { useAuth } from '@/lib/auth';
@@ -11,19 +11,20 @@ import { applyTextSize, loadTextSize } from '@/lib/preferences';
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { status, user } = useAuth();
   const router = useRouter();
-  useQuickExitShortcut();
 
   useEffect(() => applyTextSize(loadTextSize()), []);
 
   useEffect(() => {
     if (status === 'signedOut') router.replace('/login');
+    else if (status === 'signedIn' && user?.role === 'DOCTOR') router.replace('/doctor');
     else if (status === 'signedIn' && user && !user.onboarded) router.replace('/onboarding');
   }, [status, user, router]);
 
-  if (status !== 'signedIn' || !user?.onboarded) return <PageLoader label="Warming up…" />;
+  if (status !== 'signedIn' || !user?.onboarded || user.role === 'DOCTOR') return <PageLoader label="Warming up…" />;
 
   return (
     <div className="lg:flex">
+      <QuickExitFab />
       <Suspense fallback={<NavFallback />}>
         <Sidebar />
       </Suspense>

@@ -3,11 +3,11 @@
 import { formatDay, toDayNumber, type BloodPressureReading } from '@cherri/shared';
 import { useMemo, useState } from 'react';
 
-// Validated with the dataviz palette checker on the paper surface (#FBF7EF): all checks pass.
+// Validated with the dataviz palette checker on the paper surface (#FFFCFB): all checks pass.
 const SYSTOLIC = '#B5512F';
 const DIASTOLIC = '#1B6FAE';
 const GRID = '#E0D3BD';
-const SURFACE = '#FBF7EF';
+const SURFACE = '#FFFCFB';
 
 const W = 640;
 const H = 240;

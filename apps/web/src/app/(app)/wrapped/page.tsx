@@ -10,7 +10,7 @@ import { ErrorNote, PageLoader } from '@/components/ui/misc';
 import { useAuth } from '@/lib/auth';
 import { useWrapped } from '@/lib/queries';
 
-const BLOB_COLORS = ['#A4B26B', '#FBF7EF', '#33261C', '#D9AA55', '#C48A5A', '#8FAAA3'];
+const BLOB_COLORS = ['#D69AB5', '#FFFCFB', '#2E2230', '#D9AA55', '#C48A5A', '#8FAAA3'];
 
 interface Slide {
   bg: string;
@@ -22,13 +22,13 @@ interface Slide {
 
 function slidesFor(w: WrappedResponse, name: string | null): Slide[] {
   const slides: Slide[] = [
-    { bg: '#33261C', ink: '#F3EBDD', eyebrow: 'Cycle Wrapped', big: `${name ? `${name}’s` : 'Your'} last 90 days`, caption: `${formatDay(w.rangeStart)} – ${formatDay(w.rangeEnd)}` },
-    { bg: '#A4B26B', ink: '#33261C', eyebrow: 'You showed up', big: `${w.daysLogged} days logged`, caption: `Longest streak: ${w.longestStreak} days in a row. That’s real self-care.` },
+    { bg: '#2E2230', ink: '#FAF5F3', eyebrow: 'Cycle Wrapped', big: `${name ? `${name}’s` : 'Your'} last 90 days`, caption: `${formatDay(w.rangeStart)} – ${formatDay(w.rangeEnd)}` },
+    { bg: '#D69AB5', ink: '#2E2230', eyebrow: 'You showed up', big: `${w.daysLogged} days logged`, caption: `Longest streak: ${w.longestStreak} days in a row. That’s real self-care.` },
   ];
   if (w.periodsTracked > 0) {
     slides.push({
       bg: '#D9AA55',
-      ink: '#33261C',
+      ink: '#2E2230',
       eyebrow: 'Your rhythm',
       big: w.avgCycleLength ? `${Math.round(w.avgCycleLength)}-day cycles` : `${w.periodsTracked} periods tracked`,
       caption: `${w.periodsTracked} period${w.periodsTracked === 1 ? '' : 's'} tracked. Every one made Cherri’s predictions sharper.`,
@@ -36,12 +36,12 @@ function slidesFor(w: WrappedResponse, name: string | null): Slide[] {
   }
   if (w.powerPhase) {
     const guide = PHASE_GUIDES[w.powerPhase];
-    slides.push({ bg: phaseColors[w.powerPhase].fill, ink: '#33261C', eyebrow: 'Your power phase', big: `${guide.emoji} ${guide.vibe}`, caption: `Your mood and energy peak in your ${guide.name.toLowerCase()}. Plan the big stuff here.` });
+    slides.push({ bg: phaseColors[w.powerPhase].fill, ink: '#2E2230', eyebrow: 'Your power phase', big: `${guide.vibe}`, caption: `Your mood and energy peak in your ${guide.name.toLowerCase()}. Plan the big stuff here.` });
   }
   if (w.topSymptoms.length > 0) {
     slides.push({
       bg: '#8FAAA3',
-      ink: '#33261C',
+      ink: '#2E2230',
       eyebrow: 'Top symptoms',
       big: w.topSymptoms.map((s) => s.label).join(' · '),
       caption: w.topSymptoms.map((s) => `${s.label}: ${s.days} days`).join(', '),
@@ -49,14 +49,14 @@ function slidesFor(w: WrappedResponse, name: string | null): Slide[] {
   }
   if (w.toughPhase) {
     const guide = PHASE_GUIDES[w.toughPhase];
-    slides.push({ bg: '#C48A5A', ink: '#33261C', eyebrow: 'Go easy on yourself during', big: `${guide.emoji} ${guide.vibe}`, caption: 'That’s when your pain tends to peak. Rest is productive too.' });
+    slides.push({ bg: '#C48A5A', ink: '#2E2230', eyebrow: 'Go easy on yourself during', big: `${guide.vibe}`, caption: 'That’s when your pain tends to peak. Rest is productive too.' });
   }
   slides.push({
-    bg: '#33261C',
-    ink: '#F3EBDD',
+    bg: '#2E2230',
+    ink: '#FAF5F3',
     eyebrow: 'Cherri decoded',
     big: `${w.patternsFound} patterns · ${w.labsDecoded} reports · ${w.screeningsTaken} checks`,
-    caption: 'Keep logging. Your next Wrapped will know you even better. 🍒',
+    caption: 'Keep logging. Your next Wrapped will know you even better.',
   });
   return slides;
 }

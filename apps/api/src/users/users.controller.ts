@@ -2,12 +2,17 @@ import { Body, Controller, Delete, Get, HttpCode, Patch, Post, Put, Req } from '
 import {
   healthBackgroundSchema,
   onboardingSchema,
+  pinSchema,
+  unlockSchema,
   updateProfileSchema,
   type HealthBackgroundInput,
   type OnboardingInput,
+  type PinInput,
+  type UnlockInput,
   type UpdateProfileInput,
 } from '@cherri/shared';
 import type { Request } from 'express';
+import { Throttle } from '@nestjs/throttler';
 import { z } from 'zod';
 import { clientIp, CurrentUser, ZodPipe, type AuthUser } from '../common/http';
 import { UsersService } from './users.service';
@@ -32,6 +37,24 @@ export class UsersController {
   @HttpCode(200)
   onboard(@CurrentUser() user: AuthUser, @Body(new ZodPipe(onboardingSchema)) body: OnboardingInput) {
     return this.users.onboard(user.id, body);
+  }
+
+  @Put('pin')
+  setPin(@CurrentUser() user: AuthUser, @Body(new ZodPipe(pinSchema)) body: PinInput) {
+    return this.users.setPin(user.id, body);
+  }
+
+  @Delete('pin')
+  removePin(@CurrentUser() user: AuthUser) {
+    return this.users.removePin(user.id);
+  }
+
+  /** A 4-digit PIN is guessable, so attempts are tightly limited. */
+  @Post('unlock')
+  @HttpCode(200)
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  unlock(@CurrentUser() user: AuthUser, @Body(new ZodPipe(unlockSchema)) body: UnlockInput) {
+    return this.users.unlock(user.id, body);
   }
 
   /** Menarche age, family history, allergies and past surgeries, for the doctor report. */

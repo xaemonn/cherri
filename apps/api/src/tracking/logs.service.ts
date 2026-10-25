@@ -1,8 +1,10 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import type { DailyLog, SymptomEntry } from '@prisma/client';
+import { Prisma, type DailyLog, type SymptomEntry } from '@prisma/client';
 import {
   addDays,
   fromUTCDate,
+  isEmptyPbac,
+  type PbacEntry,
   toUTCDate,
   type ISODate,
   type LogDraft,
@@ -48,8 +50,13 @@ export class LogsService {
 
   async upsert(userId: string, date: ISODate, input: UpsertLogInput): Promise<LogDto> {
     await this.assertLoggableDate(userId, date);
-    const { symptoms, notes, ...fields } = input;
-    const data = { ...fields, ...(notes !== undefined && { notes: this.crypto.encryptNullable(notes) }) };
+    const { symptoms, notes, pbac, ...fields } = input;
+    const data = {
+      ...fields,
+      ...(notes !== undefined && { notes: this.crypto.encryptNullable(notes) }),
+      // Prisma needs DbNull to clear a JSON column; an empty chart is stored as no chart.
+      ...(pbac !== undefined && { pbac: pbac === null || isEmptyPbac(pbac) ? Prisma.DbNull : pbac }),
+    };
 
     const row = await this.prisma.$transaction(async (tx) => {
       const log = await tx.dailyLog.upsert({
@@ -125,6 +132,7 @@ export class LogsService {
       systolic: row.systolic,
       diastolic: row.diastolic,
       weightKg: row.weightKg,
+      pbac: (row.pbac as PbacEntry | null) ?? null,
       notes: this.crypto.decryptNullable(row.notes),
       source: row.source,
       symptoms: row.symptoms.map((s) => ({ code: s.code, severity: s.severity, bodyRegion: s.bodyRegion })),

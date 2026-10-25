@@ -1,4 +1,3 @@
-import { BricolageGrotesque_700Bold, BricolageGrotesque_800ExtraBold } from '@expo-google-fonts/bricolage-grotesque';
 import { Figtree_400Regular, Figtree_500Medium, Figtree_600SemiBold, Figtree_700Bold } from '@expo-google-fonts/figtree';
 import { ApiError } from '@cherri/shared';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -7,6 +6,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
+import { ShieldProvider } from '@/components/shield';
 import { AuthProvider, useAuth } from '@/lib/auth';
 import { colors, fonts } from '@/lib/theme';
 
@@ -54,8 +54,11 @@ function RootNavigator({ fontsLoaded }: { fontsLoaded: boolean }) {
         <Stack.Screen name="learn" options={subScreen('Learn & myths')} />
         <Stack.Screen name="care" options={subScreen('Find care')} />
         <Stack.Screen name="pregnancy" options={subScreen('Pregnancy & baby')} />
-        <Stack.Screen name="safety" options={subScreen('Safety & SOS')} />
         <Stack.Screen name="settings" options={subScreen('Settings')} />
+        <Stack.Screen name="consult/index" options={subScreen('Consult a doctor')} />
+        <Stack.Screen name="consult/[id]" options={subScreen('Consultation')} />
+        <Stack.Screen name="meds" options={subScreen('Medicine guardian')} />
+        <Stack.Screen name="ec" options={subScreen('Accident help')} />
       </Stack.Protected>
     </Stack>
   );
@@ -63,8 +66,6 @@ function RootNavigator({ fontsLoaded }: { fontsLoaded: boolean }) {
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
-    BricolageGrotesque_700Bold,
-    BricolageGrotesque_800ExtraBold,
     Figtree_400Regular,
     Figtree_500Medium,
     Figtree_600SemiBold,
@@ -83,7 +84,9 @@ export default function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <StatusBar style="dark" />
-        <RootNavigator fontsLoaded={fontsLoaded} />
+        <ShieldProvider>
+          <RootNavigator fontsLoaded={fontsLoaded} />
+        </ShieldProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

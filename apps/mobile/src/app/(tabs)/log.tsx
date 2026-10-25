@@ -5,16 +5,20 @@ import {
   FLOW_LEVELS,
   flowStyles,
   formatDay,
+  isEmptyPbac,
   moodScale,
   symptomCategoriesFor,
   SYMPTOMS,
   todayIn,
   type FlowLevel,
+  type PbacEntry,
   type SymptomCategory,
   type SymptomCode,
 } from '@cherri/shared';
 import { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ScaleIcon } from '@/components/scale-icon';
+import { PbacCard } from '@/components/pbac';
 import { TalkToLog } from '@/components/talk-to-log';
 import { Button, Card, Chip, Loader, Screen, T, tap } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
@@ -44,13 +48,14 @@ interface FormState {
   weightKg: string;
   symptoms: Map<SymptomCode, number>;
   notes: string;
+  pbac: PbacEntry;
 }
 
-const EMPTY: FormState = { flow: null, painLevel: null, mood: null, energy: null, sleepHours: null, systolic: '', diastolic: '', weightKg: '', symptoms: new Map(), notes: '' };
+const EMPTY: FormState = { flow: null, painLevel: null, mood: null, energy: null, sleepHours: null, systolic: '', diastolic: '', weightKg: '', symptoms: new Map(), notes: '', pbac: {} };
 
 const numberOrNull = (value: string) => (value.trim() === '' ? null : Number(value));
 
-function ScaleRow({ items, value, onChange }: { items: ReadonlyArray<{ value: number; emoji: string; label: string }>; value: number | null; onChange: (v: number | null) => void }) {
+function ScaleRow({ items, kind, value, onChange }: { items: ReadonlyArray<{ value: number; label: string }>; kind: 'mood' | 'energy'; value: number | null; onChange: (v: number | null) => void }) {
   return (
     <View style={styles.scale}>
       {items.map((item) => (
@@ -62,7 +67,7 @@ function ScaleRow({ items, value, onChange }: { items: ReadonlyArray<{ value: nu
           }}
           style={[styles.scaleItem, value === item.value && styles.scaleSelected]}
         >
-          <Text style={{ fontSize: 26 }}>{item.emoji}</Text>
+          <ScaleIcon kind={kind} value={item.value} color={colors.ink} />
           <Text style={styles.scaleLabel}>{item.label}</Text>
         </Pressable>
       ))}
@@ -94,6 +99,7 @@ export default function LogScreen() {
             weightKg: log.weightKg?.toString() ?? '',
             symptoms: new Map(log.symptoms.map((s) => [s.code as SymptomCode, s.severity])),
             notes: log.notes ?? '',
+            pbac: log.pbac ?? {},
           }
         : EMPTY,
     );
@@ -129,11 +135,12 @@ export default function LogScreen() {
         diastolic,
         weightKg: numberOrNull(form.weightKg),
         notes: form.notes.trim() || null,
+        pbac: isEmptyPbac(form.pbac) ? null : form.pbac,
         symptoms: [...form.symptoms.entries()].map(([code, severity]) => ({ code, severity })),
       },
       {
         onSuccess: () => {
-          setSaved(date === today ? 'Today is logged. Proud of you! 🍒' : `Saved ${formatDay(date)} ✅`);
+          setSaved(date === today ? 'Today is logged. Proud of you!' : `Saved ${formatDay(date)}`);
           setTimeout(() => setSaved(null), 3000);
         },
       },
@@ -154,7 +161,7 @@ export default function LogScreen() {
         ))}
       </ScrollView>
 
-      <TalkToLog date={date} onLogged={(summary) => setSaved(`Logged ${summary} ✅`)} />
+      <TalkToLog date={date} onLogged={(summary) => setSaved(`Logged ${summary}`)} />
 
       {isLoading ? (
         <Loader />
@@ -166,13 +173,15 @@ export default function LogScreen() {
               {FLOW_LEVELS.map((flow) => (
                 <Chip
                   key={flow}
-                  label={`${flow === 'NONE' ? '🚫' : '🩸'.repeat(Math.max(1, flowStyles[flow].drops))} ${flowStyles[flow].label}`}
+                  label={`${flow === 'NONE' ? '' : ''.repeat(Math.max(1, flowStyles[flow].drops))} ${flowStyles[flow].label}`}
                   selected={form.flow === flow}
                   onPress={() => setForm({ ...form, flow: form.flow === flow ? null : flow })}
                 />
               ))}
             </View>
           </Card>
+
+          <PbacCard value={form.pbac} onChange={(pbac) => setForm((f) => ({ ...f, pbac }))} />
 
           <Card tone="tangerine" style={{ gap: 10 }}>
             <T variant="h3">Pain {form.painLevel !== null ? `· ${form.painLevel}/10` : ''}</T>
@@ -194,9 +203,9 @@ export default function LogScreen() {
 
           <Card tone="periwinkle" style={{ gap: 8 }}>
             <T variant="h3">Mood</T>
-            <ScaleRow items={moodScale} value={form.mood} onChange={(mood) => setForm({ ...form, mood })} />
+            <ScaleRow kind="mood" items={moodScale} value={form.mood} onChange={(mood) => setForm({ ...form, mood })} />
             <T variant="h3">Energy</T>
-            <ScaleRow items={energyScale} value={form.energy} onChange={(energy) => setForm({ ...form, energy })} />
+            <ScaleRow kind="energy" items={energyScale} value={form.energy} onChange={(energy) => setForm({ ...form, energy })} />
           </Card>
 
           <Card tone="sage" style={{ gap: 10 }}>
@@ -258,7 +267,7 @@ export default function LogScreen() {
                 <T variant="eyebrow">{CATEGORY_LABELS[category]}</T>
                 <View style={styles.wrap}>
                   {SYMPTOMS.filter((s) => s.category === category).map((s) => (
-                    <Chip key={s.code} label={s.label} emoji={s.emoji} selected={form.symptoms.has(s.code)} onPress={() => toggleSymptom(s.code)} />
+                    <Chip key={s.code} label={s.label} selected={form.symptoms.has(s.code)} onPress={() => toggleSymptom(s.code)} />
                   ))}
                 </View>
               </View>

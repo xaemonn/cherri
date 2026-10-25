@@ -24,11 +24,11 @@ interface Message {
 const STARTERS = ['Why am I so tired lately?', 'Is my cycle normal?', 'Aaj bahut cramps hain, kya karun?', 'Explain my blood report'];
 
 function Action({ action }: { action: ChatAction }) {
-  if (action.kind === 'LOGGED') return <Text style={styles.logged}>✅ Logged {action.summary}</Text>;
+  if (action.kind === 'LOGGED') return <Text style={styles.logged}>Logged {action.summary}</Text>;
   if (action.kind === 'SHOW_CYCLE') return null;
   return (
     <Pressable onPress={() => router.push(`/checks/${action.screening}`)} style={styles.suggest}>
-      <Text style={styles.suggestTitle}>🩺 Take the {SCREENINGS[action.screening as ScreeningType]?.title ?? 'health check'}</Text>
+      <Text style={styles.suggestTitle}>Take the {SCREENINGS[action.screening as ScreeningType]?.title ?? 'health check'}</Text>
       <Text style={styles.suggestText}>{action.reason}</Text>
     </Pressable>
   );
@@ -134,11 +134,11 @@ export default function Chat() {
                   <View style={{ flex: 1, gap: 6 }}>
                     {m.safety && (
                       <View style={styles.safety}>
-                        <Text style={styles.safetyTitle}>You’re not alone 💛</Text>
+                        <Text style={styles.safetyTitle}>You’re not alone</Text>
                         <Text style={styles.safetyText}>{m.safety.message}</Text>
                         {m.safety.helplines.map((h) => (
                           <Pressable key={h.number} onPress={() => void Linking.openURL(`tel:${h.number}`)} style={styles.callBtn}>
-                            <Text style={styles.callText}>📞 {h.name} · {h.number}</Text>
+                            <Text style={styles.callText}>{h.name} · {h.number}</Text>
                           </Pressable>
                         ))}
                       </View>

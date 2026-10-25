@@ -1,19 +1,21 @@
 'use client';
 
-import { addDays, COMPANION_TONES, LANGUAGES, LIFE_STAGES, todayIn, type CompanionTone, type Language, type LifeStage } from '@cherri/shared';
+import { addDays, CAMOUFLAGES, COMPANION_TONES, LANGUAGES, LIFE_STAGES, todayIn, type CompanionTone, type Language, type LifeStage } from '@cherri/shared';
 import { useQueryClient } from '@tanstack/react-query';
-import { Download, LogOut, Trash2 } from 'lucide-react';
+import { Download, EyeOff, KeyRound, LogOut, Trash2, UserRound } from 'lucide-react';
+import { Tabs } from '@/components/ui/tabs';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Chip } from '@/components/ui/chip';
-import { FieldError, Input, Label, Select } from '@/components/ui/field';
+import { FieldError, Input, Label, PasswordInput, Select } from '@/components/ui/field';
 import { PageHeader } from '@/components/ui/misc';
 import { useToast } from '@/components/ui/toast';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { saveTextSize, TEXT_SIZES, useTextSize } from '@/lib/preferences';
+import { CAMOUFLAGE_OPTIONS, saveCamouflage, useCamouflage } from '@/lib/shield';
 
 const STAGE_LABELS: Record<LifeStage, string> = {
   CYCLE: 'Tracking my cycle',
@@ -23,7 +25,7 @@ const STAGE_LABELS: Record<LifeStage, string> = {
   PERIMENOPAUSE: 'Perimenopause',
   MENOPAUSE: 'Menopause',
 };
-const TONE_LABELS: Record<CompanionTone, string> = { BESTIE: 'Bestie 💅', BIG_SIS: 'Big sis 🫶', CLINICAL: 'Straight facts 🩺' };
+const TONE_LABELS: Record<CompanionTone, string> = { BESTIE: 'Bestie', BIG_SIS: 'Big sis', CLINICAL: 'Straight facts' };
 const LANGUAGE_LABELS: Record<Language, string> = { en: 'English', hinglish: 'Hinglish', hi: 'हिंदी', kn: 'ಕನ್ನಡ' };
 
 export default function SettingsPage() {
@@ -46,6 +48,9 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState('');
   const textSize = useTextSize();
+  const camouflage = useCamouflage();
+  const [pin, setPin] = useState('');
+  const [tab, setTab] = useState<'profile' | 'privacy' | 'account'>('profile');
 
   if (!user) return null;
   const today = todayIn(user.timezone);
@@ -64,7 +69,7 @@ export default function SettingsPage() {
         }),
       );
       await queryClient.invalidateQueries();
-      toast('Profile saved', '✨');
+      toast('Profile saved');
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not save.');
     } finally {
@@ -76,9 +81,20 @@ export default function SettingsPage() {
     event.preventDefault();
     try {
       setUser((await api.auth.upgrade(account)).user);
-      toast('Account secured with your email', '🔒');
+      toast('Account secured with your email');
     } catch (e) {
-      toast(e instanceof Error ? e.message : 'Could not upgrade.', '😕');
+      toast(e instanceof Error ? e.message : 'Could not upgrade.');
+    }
+  }
+
+  async function savePin(event: React.FormEvent) {
+    event.preventDefault();
+    try {
+      setUser(await api.me.setPin({ pin }));
+      setPin('');
+      toast('Privacy PIN saved');
+    } catch (e) {
+      toast(e instanceof Error ? e.message : 'Could not save the PIN.');
     }
   }
 
@@ -96,6 +112,17 @@ export default function SettingsPage() {
     <div className="space-y-6">
       <PageHeader eyebrow="Settings" title="You, your way" />
 
+      <Tabs
+        value={tab}
+        onChange={setTab}
+        tabs={[
+          { id: 'profile', label: 'Profile', icon: UserRound },
+          { id: 'privacy', label: 'Privacy & shield', icon: EyeOff },
+          { id: 'account', label: 'Account', icon: KeyRound },
+        ]}
+      />
+      {tab === 'profile' && (
+      <>
       <Card>
         <h2 className="text-xl font-semibold">Profile</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -175,14 +202,84 @@ export default function SettingsPage() {
           ))}
         </div>
       </Card>
+      </>
+      )}
 
+      {tab === 'privacy' && (
+      <Card id="shield">
+        <h2 className="flex items-center gap-2 text-xl font-semibold">
+          <EyeOff className="size-5 text-cherry" /> Screen shield
+        </h2>
+        <p className="mt-1 text-sm text-ink-soft">
+          What appears when you tap <strong>Quick exit</strong>, press <kbd className="rounded border border-line bg-cream px-1.5 text-xs">Esc</kbd> twice or{' '}
+          <kbd className="rounded border border-line bg-cream px-1.5 text-xs">Alt</kbd>+<kbd className="rounded border border-line bg-cream px-1.5 text-xs">Q</kbd>. To come back, open the
+          ⋮ menu on the disguise and enter your PIN.
+        </p>
+        <div className="mt-4 grid gap-2 sm:grid-cols-3">
+          {CAMOUFLAGES.map((c) => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => saveCamouflage(c)}
+              aria-pressed={camouflage === c}
+              className={`rounded-2xl border p-3 text-left transition-colors ${camouflage === c ? 'border-olive-deep bg-olive-soft' : 'border-line bg-paper hover:bg-cream'}`}
+            >
+              <p className="font-semibold">{CAMOUFLAGE_OPTIONS[c].label}{c === 'WEATHER' && ' (default)'}</p>
+              <p className="text-xs text-ink-soft">Tab shows “{CAMOUFLAGE_OPTIONS[c].title.split(' – ')[0]}”. {CAMOUFLAGE_OPTIONS[c].hint}</p>
+            </button>
+          ))}
+        </div>
+        <div className="mt-5 rounded-2xl bg-cream p-4">
+          <p className="flex items-center gap-2 font-semibold">
+            <KeyRound className="size-4" /> Privacy PIN {user.hasPin ? <span className="text-sm font-medium text-olive-deep">· set</span> : <span className="text-sm font-medium text-ink-soft">· not set</span>}
+          </p>
+          <p className="mt-1 text-sm text-ink-soft">
+            {user.hasPin
+              ? 'Cherri unlocks only with this 4-digit PIN after a quick exit.'
+              : user.isGuest
+                ? 'Without a PIN, anyone can reopen Cherri after a quick exit. Set one now.'
+                : 'Until you set one, your account password unlocks Cherri.'}
+          </p>
+          <form onSubmit={savePin} className="mt-3 flex flex-wrap gap-2">
+            <Input
+              inputMode="numeric"
+              pattern="\d{4}"
+              maxLength={4}
+              required
+              value={pin}
+              onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+              placeholder="4 digits"
+              aria-label="New 4-digit PIN"
+              className="max-w-36 tracking-[0.4em]"
+            />
+            <Button type="submit" disabled={pin.length !== 4}>
+              {user.hasPin ? 'Change PIN' : 'Set PIN'}
+            </Button>
+            {user.hasPin && (
+              <Button
+                variant="ghost"
+                onClick={async () => {
+                  setUser(await api.me.removePin());
+                  toast('PIN removed');
+                }}
+              >
+                Remove PIN
+              </Button>
+            )}
+          </form>
+        </div>
+      </Card>
+      )}
+
+      {tab === 'account' && (
+      <>
       {user.isGuest && (
         <Card tone="ochre">
           <h2 className="text-xl font-semibold">Keep your data safe</h2>
           <p className="mt-1 text-sm text-ink-soft">You’re using Cherri as a guest. Add an email so you can log in on any device. Everything you’ve logged stays.</p>
           <form onSubmit={upgrade} className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
             <Input type="email" required placeholder="Email" value={account.email} onChange={(e) => setAccount({ ...account, email: e.target.value })} />
-            <Input type="password" required minLength={8} placeholder="Password (8+ chars)" value={account.password} onChange={(e) => setAccount({ ...account, password: e.target.value })} />
+            <PasswordInput required minLength={8} placeholder="Password (8+ chars)" value={account.password} onChange={(e) => setAccount({ ...account, password: e.target.value })} />
             <Button type="submit">Save account</Button>
           </form>
         </Card>
@@ -225,6 +322,8 @@ export default function SettingsPage() {
           </div>
         </div>
       </Card>
+      </>
+      )}
     </div>
   );
 }

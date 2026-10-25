@@ -1,4 +1,4 @@
-import { bandStyles, formatDay, labFlagStyles, severityStyles, type DoctorReport } from '@cherri/shared';
+import { bandStyles, formatDay, labFlagStyles, PBAC_HEAVY_SCORE, severityStyles, type DoctorReport, type ReportBloodLoss } from '@cherri/shared';
 import { CherryMark } from '@/components/brand/logo';
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -26,6 +26,44 @@ function Fact({ label, value }: { label: string; value: string | null | undefine
       <dt className="text-[11px] font-bold text-ink-soft uppercase">{label}</dt>
       <dd>{value}</dd>
     </div>
+  );
+}
+
+/** PBAC sits first: a measured blood-loss score is the evidence most often missing at a heavy-period visit. */
+function BloodLoss({ data }: { data: ReportBloodLoss }) {
+  const max = Math.max(PBAC_HEAVY_SCORE * 1.5, ...data.cycles.map((c) => c.score));
+  return (
+    <section className={`break-inside-avoid rounded-2xl border-2 p-4 ${data.heavy ? 'border-cherry/50 bg-cherry-soft/50' : 'border-line bg-cream'}`}>
+      <h3 className="text-xs font-semibold tracking-[0.18em] text-ink-soft uppercase">Menstrual blood loss · PBAC (Higham 1990)</h3>
+      <div className="mt-2 flex flex-wrap items-baseline gap-x-6 gap-y-1">
+        <p>
+          <span className={`text-4xl font-semibold ${data.heavy ? 'text-cherry' : 'text-olive-deep'}`}>{data.score}</span> points
+        </p>
+        <p>
+          ≈ <strong>{data.estimatedMl} mL</strong> per period
+        </p>
+        <p className={data.heavy ? 'font-bold text-cherry-deep' : 'font-semibold text-olive-deep'}>
+          {data.heavy ? 'Heavy menstrual bleeding (PBAC > 100 or > 80 mL)' : 'Below the heavy-bleeding threshold'}
+        </p>
+      </div>
+      <p className="mt-1 text-ink-soft">
+        Period starting {formatDay(data.start)} · clots: {data.clotsLarge} large (≥ ₹5 coin), {data.clotsSmall} small · flooding episodes: {data.flooding}
+      </p>
+      {data.cycles.length > 1 && (
+        <ul className="mt-3 space-y-1" aria-label="PBAC score by period">
+          {data.cycles.map((c) => (
+            <li key={c.start} className="grid grid-cols-[5.5rem_1fr_3rem] items-center gap-2 text-xs">
+              <span className="text-ink-soft">{formatDay(c.start)}</span>
+              <span className="relative h-2.5 rounded-full bg-paper">
+                <span className={`absolute inset-y-0 left-0 rounded-full ${c.heavy ? 'bg-cherry' : 'bg-olive'}`} style={{ width: `${(c.score / max) * 100}%` }} />
+                <span className="absolute -inset-y-1 w-px bg-ink" style={{ left: `${(PBAC_HEAVY_SCORE / max) * 100}%` }} title="100-point threshold" />
+              </span>
+              <span className="text-right font-semibold">{c.score}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
 
@@ -60,6 +98,8 @@ export function DoctorReportView({ report }: { report: DoctorReport }) {
         </div>
       </header>
 
+      {report.bloodLoss && <BloodLoss data={report.bloodLoss} />}
+
       {report.summary && <p className="rounded-2xl bg-cream p-4 text-[15px] leading-relaxed">{report.summary}</p>}
 
       {story && (
@@ -78,7 +118,7 @@ export function DoctorReportView({ report }: { report: DoctorReport }) {
           </dl>
           <details className="mt-3 print:block" open>
             <summary className="cursor-pointer text-xs font-bold text-ink-soft uppercase print:hidden">Her full account</summary>
-            <blockquote className="mt-2 border-l-2 border-line pl-3 text-ink-soft italic">{story.inHerWords}</blockquote>
+            <blockquote className="mt-2 border-l-2 border-line pl-3 text-ink-soft">{story.inHerWords}</blockquote>
           </details>
         </Section>
       )}

@@ -46,7 +46,7 @@ pnpm db:up                                   # Postgres on localhost:5433
 cp apps/api/.env.example apps/api/.env       # fill JWT_ACCESS_SECRET, ENCRYPTION_KEY, GROQ_API_KEY, GEMINI_API_KEY
 cp apps/web/.env.example apps/web/.env.local
 pnpm db:migrate
-pnpm db:seed                                 # demo account: demo@cherri.app / cherri-demo-2026
+pnpm db:seed                                 # demo@cherri.app, pregnancy@cherri.app / cherri-demo-2026; doctor@cherri.app / cherri-doctor-2026
 pnpm ai:check                                # confirms your AI keys and models work
 ```
 

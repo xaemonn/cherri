@@ -6,8 +6,8 @@ import Link from 'next/link';
 import { ErrorNote, PageHeader, PageLoader } from '@/components/ui/misc';
 import { useScreenings } from '@/lib/queries';
 
-const CARD_TONES = ['#E6E9D3', '#F3E6C6', '#DFE7E3', '#F0E0CC', '#E6EADD'];
-const EMOJIS: Record<string, string> = { PCOS: '🌀', ENDOMETRIOSIS: '⚡', PMDD: '🎢', ANEMIA: '🩸', THYROID: '🦋' };
+const CARD_TONES = ['#F8E6EE', '#F3E6C6', '#DFE7E3', '#F0E0CC', '#E6EADD'];
+const EMOJIS: Record<string, string> = { PCOS: '', ENDOMETRIOSIS: '', PMDD: '', ANEMIA: '', THYROID: '' };
 
 export default function ChecksPage() {
   const { data, isLoading, error } = useScreenings();
@@ -52,7 +52,7 @@ export default function ChecksPage() {
           href="/mind"
           className="group flex flex-col gap-3 rounded-card border border-ink/10 bg-dusk-soft p-6 shadow-lift transition-transform hover:-translate-y-1 md:col-span-2"
         >
-          <span className="text-4xl">🧠</span>
+          <span className="text-4xl"></span>
           <h2 className="text-2xl font-semibold">Mood & anxiety check-in</h2>
           <p className="text-ink-soft">PHQ-9 and GAD-7, the two short questionnaires doctors worldwide use. Your score goes in your doctor report, never your answers.</p>
           <span className="mt-auto inline-flex items-center gap-1 pt-2 text-sm font-bold">

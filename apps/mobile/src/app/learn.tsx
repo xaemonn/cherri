@@ -43,7 +43,7 @@ export default function Learn() {
     <Screen bottomInset={40}>
       <T variant="title">Myth or fact?</T>
       <T variant="small" style={{ marginTop: 4 }}>
-        Score: {score} 🍒 · card {(index % MYTHS.length) + 1} of {MYTHS.length}
+        Score: {score} · card {(index % MYTHS.length) + 1} of {MYTHS.length}
       </T>
       <Card sticker style={{ marginTop: 16, gap: 14, backgroundColor: TONES[index % TONES.length] }}>
         <T variant="eyebrow">Myth or fact?</T>
@@ -51,7 +51,7 @@ export default function Learn() {
         {guess ? (
           <View style={{ gap: 8 }}>
             <Text style={[styles.verdict, { backgroundColor: verdict.bg, color: verdict.ink }]}>
-              {verdict.emoji} {verdict.label} · {(guess === 'fact') === isFact ? 'You got it! 🎉' : 'Not quite!'}
+              {verdict.label} · {(guess === 'fact') === isFact ? 'You got it!' : 'Not quite!'}
             </Text>
             <T>{myth.explanation}</T>
             <T variant="small">{evidenceStyles[myth.evidence].label}</T>
@@ -66,8 +66,8 @@ export default function Learn() {
           </View>
         ) : (
           <View style={{ flexDirection: 'row', gap: 10 }}>
-            <Button label="❌ Myth" variant="outline" onPress={() => choose('myth')} style={{ flex: 1 }} />
-            <Button label="✅ Fact" onPress={() => choose('fact')} style={{ flex: 1 }} />
+            <Button label="Myth" variant="outline" onPress={() => choose('myth')} style={{ flex: 1 }} />
+            <Button label="Fact" onPress={() => choose('fact')} style={{ flex: 1 }} />
           </View>
         )}
       </Card>
@@ -80,7 +80,7 @@ export default function Learn() {
         {result && (
           <View style={styles.result}>
             <Text style={[styles.verdict, { backgroundColor: verdictStyles[result.verdict].bg, color: verdictStyles[result.verdict].ink }]}>
-              {verdictStyles[result.verdict].emoji} {verdictStyles[result.verdict].label}
+              {verdictStyles[result.verdict].label}
             </Text>
             <T>{result.explanation.replace(/\s*\[\d+\]/g, '')}</T>
             <T variant="small">{evidenceStyles[result.evidence].label}</T>

@@ -5,11 +5,11 @@ import { Card, Pill, T } from '@/components/ui';
 import { colors, fonts } from '@/lib/theme';
 
 const WINDOW: Record<PatternWindow, { label: string; bg: string }> = {
-  MENSTRUAL: { label: '🩸 During period', bg: '#FFE2C6' },
-  FOLLICULAR: { label: '🌱 After period', bg: '#E6F3C8' },
-  OVULATORY: { label: '✨ Around ovulation', bg: '#FFEFC2' },
-  LUTEAL: { label: '🌙 Second half', bg: '#E1E4FF' },
-  PREMENSTRUAL: { label: '⏳ Week before period', bg: '#E1E4FF' },
+  MENSTRUAL: { label: 'During period', bg: '#FFE2C6' },
+  FOLLICULAR: { label: 'After period', bg: '#E6F3C8' },
+  OVULATORY: { label: 'Around ovulation', bg: '#FFEFC2' },
+  LUTEAL: { label: 'Second half', bg: '#E1E4FF' },
+  PREMENSTRUAL: { label: 'Week before period', bg: '#E1E4FF' },
 };
 
 export function PatternCard({ pattern }: { pattern: PatternInsight }) {
@@ -34,7 +34,7 @@ export function FlagCard({ flag }: { flag: RedFlag }) {
   return (
     <View style={{ backgroundColor: s.bg, borderRadius: 24, padding: 16, marginBottom: 12, gap: 4 }}>
       <Text style={{ fontFamily: fonts.bold, fontSize: 11, letterSpacing: 1.5, color: s.ink, textTransform: 'uppercase' }}>
-        {s.emoji} {s.label}
+        {s.label}
       </Text>
       <Text style={{ fontFamily: fonts.display, fontSize: 18, color: s.ink }}>{flag.title}</Text>
       <Text style={{ fontFamily: fonts.body, fontSize: 14, lineHeight: 20, color: s.ink }}>{flag.detail}</Text>

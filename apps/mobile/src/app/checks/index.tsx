@@ -6,7 +6,7 @@ import { useScreenings } from '@/lib/queries';
 import { colors, fonts } from '@/lib/theme';
 
 const TONES = ['#E6F3C8', '#FFEFC2', '#E1E4FF', '#FFE7C2', '#DCEFE0'];
-const EMOJIS: Record<string, string> = { PCOS: '🌀', ENDOMETRIOSIS: '⚡', PMDD: '🎢', ANEMIA: '🩸', THYROID: '🦋' };
+const EMOJIS: Record<string, string> = { PCOS: '', ENDOMETRIOSIS: '', PMDD: '', ANEMIA: '', THYROID: '' };
 
 export default function Checks() {
   const { data, isLoading, error } = useScreenings();

@@ -1,5 +1,6 @@
 import {
   addDays,
+  pbacCycles,
   bloodPressureReadings,
   diffDays,
   formatDay,
@@ -36,7 +37,7 @@ export interface ReportExtras {
 }
 
 const PCOS_FLAGS = ['INFREQUENT_PERIODS', 'IRREGULAR_CYCLES', 'NO_PERIOD_90_DAYS'];
-const ANAEMIA_FLAGS = ['HEAVY_BLEEDING', 'LONG_PERIODS', 'FREQUENT_PERIODS', 'LOW_HAEMOGLOBIN', 'PREGNANCY_ANAEMIA', 'SEVERE_ANAEMIA'];
+const ANAEMIA_FLAGS = ['PBAC_HEAVY', 'HEAVY_BLEEDING', 'LONG_PERIODS', 'FREQUENT_PERIODS', 'LOW_HAEMOGLOBIN', 'PREGNANCY_ANAEMIA', 'SEVERE_ANAEMIA'];
 const BP_FLAGS = ['SEVERE_HYPERTENSION', 'PREECLAMPSIA_WARNING_SIGNS', 'HIGH_BP_MATERNAL', 'BP_RISING', 'HIGH_BP', 'VERY_HIGH_BP'];
 
 function questionsFor(snap: HealthSnapshot, screenings: Map<ScreeningType, ScreeningRecord>, maxPain: number | null, extras: ReportExtras): string[] {
@@ -68,6 +69,10 @@ function questionsFor(snap: HealthSnapshot, screenings: Map<ScreeningType, Scree
     q.push(
       `My period pain reaches ${maxPain ?? 'severe levels'}/10 and affects my daily life. Could this be endometriosis or adenomyosis, and what are my options beyond painkillers?`,
     );
+  }
+  if (flags.has('PBAC_HEAVY')) {
+    const pbac = pbacCycles(snap.periods, snap.logs, snap.today).at(-1);
+    q.push(`My PBAC blood-loss score was ${pbac?.score ?? 'over 100'}. Could fibroids, polyps or adenomyosis be the cause, and do I need an ultrasound and iron tests?`);
   }
   if (flags.has('HEAVY_BLEEDING') || flags.has('LONG_PERIODS') || (hb?.flag === 'LOW' && !snap.pregnancy)) {
     q.push(
@@ -141,6 +146,11 @@ function summarize(report: Omit<DoctorReport, 'summary'>): string {
   if (cycle?.averageCycleLength) {
     parts.push(`Cycles average ${cycle.averageCycleLength} days (range ${cycle.shortestCycle}–${cycle.longestCycle}), ${cycle.regularity.toLowerCase()}.`);
   }
+  if (report.bloodLoss) {
+    parts.push(
+      `Menstrual blood loss PBAC ${report.bloodLoss.score} (≈${report.bloodLoss.estimatedMl} mL)${report.bloodLoss.heavy ? ', in the heavy menstrual bleeding range (>100)' : ''}.`,
+    );
+  }
   if (pain.maximum != null && pain.maximum >= 4) parts.push(`Pain reached ${pain.maximum}/10, with ${pain.daysAt6OrMore} days at 6/10 or more.`);
   const top = report.symptoms.slice(0, 3).map((s) => `${(s.clinicalTerm ?? s.label).toLowerCase()} (${Math.round(s.shareOfLoggedDays * 100)}%)`);
   if (top.length) parts.push(`Most logged: ${top.join(', ')} of logged days.`);
@@ -173,6 +183,20 @@ export function buildDoctorReport(snap: HealthSnapshot, screenings: Map<Screenin
   const bloodPressure = bloodPressureReadings(logsInRange).slice(-30).map(({ date, systolic, diastolic }) => ({ date, systolic, diastolic }));
   const weight = weightReadings(logsInRange).slice(-20);
   const shiftByMedication = new Map(extras.moodShifts.map((s) => [s.medication, { before: s.before, after: s.after }]));
+  const measured = pbacCycles(snap.periods, snap.logs, snap.today).filter((c) => c.start >= addDays(rangeStart, -14));
+  const latestPbac = measured.at(-1);
+  const bloodLoss = latestPbac
+    ? {
+        score: latestPbac.score,
+        estimatedMl: latestPbac.estimatedMl,
+        heavy: latestPbac.heavy,
+        start: latestPbac.start,
+        clotsSmall: latestPbac.clotsSmall,
+        clotsLarge: latestPbac.clotsLarge,
+        flooding: latestPbac.flooding,
+        cycles: measured.map(({ start, score, estimatedMl, heavy }) => ({ start, score, estimatedMl, heavy })),
+      }
+    : null;
 
   const report: Omit<DoctorReport, 'summary'> = {
     version: 1,
@@ -259,6 +283,7 @@ export function buildDoctorReport(snap: HealthSnapshot, screenings: Map<Screenin
     vitals: bloodPressure.length || weight.length ? { bloodPressure, weight } : null,
     notYetOnRecord: notYetOnRecord(snap, screenings, extras),
     mindChecks: extras.mindChecks,
+    bloodLoss,
   };
   return { ...report, summary: summarize(report) };
 }

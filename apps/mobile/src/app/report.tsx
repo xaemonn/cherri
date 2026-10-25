@@ -75,12 +75,12 @@ export default function Report() {
             </Text>
             {created.report.redFlags.slice(0, 4).map((f) => (
               <Text key={f.title} style={styles.line}>
-                ⚠️ {f.title}
+                {f.title}
               </Text>
             ))}
             {created.report.questionsToAsk.slice(0, 3).map((q) => (
               <Text key={q} style={styles.line}>
-                ❓ {q}
+                {q}
               </Text>
             ))}
           </Card>

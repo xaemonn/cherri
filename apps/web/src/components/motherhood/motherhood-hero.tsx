@@ -4,7 +4,7 @@ import { ButtonLink } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/cn';
 
-const KIND_EMOJI: Record<CareStepView['kind'], string> = { VISIT: '🩺', TEST: '🧪', VACCINE: '💉', SUPPLEMENT: '💊', PLAN: '📝' };
+const KIND_EMOJI: Record<CareStepView['kind'], string> = { VISIT: '', TEST: '', VACCINE: '', SUPPLEMENT: '', PLAN: '' };
 
 /** Where she is in pregnancy or the weeks after birth, and what's next. */
 export function MotherhoodHero({ status, compact = false }: { status: MotherhoodStatus; compact?: boolean }) {
@@ -25,7 +25,7 @@ export function MotherhoodHero({ status, compact = false }: { status: Motherhood
               </p>
               {status.baby && (
                 <p className="mt-3 text-lg font-semibold">
-                  <span aria-hidden="true">{status.baby.emoji}</span> Baby is about the size of {status.baby.name}
+                  Baby is about the size of {status.baby.name}
                 </p>
               )}
               <div className="mt-4 flex flex-wrap gap-2 text-sm font-bold">

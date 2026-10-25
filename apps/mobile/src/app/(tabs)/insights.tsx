@@ -34,7 +34,7 @@ export default function Insights() {
         <Stat label="Range" value={stats?.shortestCycle ? `${stats.shortestCycle}–${stats.longestCycle}` : '—'} hint="days" bg="#E1E4FF" />
       </View>
 
-      <SectionTitle eyebrow="📡 Pattern Radar" title="Symptoms that follow your cycle" />
+      <SectionTitle eyebrow="Pattern Radar" title="Symptoms that follow your cycle" />
       {!patterns.ready ? (
         <Card tone="cream">
           <T variant="small">
@@ -64,7 +64,7 @@ export default function Insights() {
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                   <Text style={styles.symptom}>{s.label}</Text>
                   <Text style={styles.symptomDays}>
-                    {s.days} days {s.peakPhase ? PHASE_GUIDES[s.peakPhase].emoji : ''}
+                    {s.days} days{s.peakPhase ? ` · peaks ${PHASE_GUIDES[s.peakPhase].name.toLowerCase()}` : ''}
                   </Text>
                 </View>
                 <View style={styles.bar}>

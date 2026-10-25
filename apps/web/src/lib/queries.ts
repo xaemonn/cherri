@@ -28,6 +28,12 @@ export const keys = {
   story: ['story'] as const,
   background: ['background'] as const,
   contacts: ['contacts'] as const,
+  consults: ['consults'] as const,
+  consult: (id: string) => ['consult', id] as const,
+  consultPreview: ['consultPreview'] as const,
+  doctorInbox: (status: string) => ['doctorInbox', status] as const,
+  doctorConsult: (id: string) => ['doctorConsult', id] as const,
+  reminders: ['reminders'] as const,
 };
 
 /** Anything that changes health data invalidates every derived view. */
@@ -35,7 +41,7 @@ export function useInvalidateHealth() {
   const queryClient = useQueryClient();
   return () =>
     Promise.all(
-      [keys.dashboard, keys.cycle, keys.insights, keys.logs, keys.screenings, keys.motherhood, ['log'], ['report'], ['wrapped']].map((queryKey) =>
+      [keys.dashboard, keys.cycle, keys.insights, keys.logs, keys.screenings, keys.motherhood, keys.consultPreview, ['log'], ['report'], ['wrapped']].map((queryKey) =>
         queryClient.invalidateQueries({ queryKey }),
       ),
     );

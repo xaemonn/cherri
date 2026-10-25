@@ -17,7 +17,8 @@
     "db:down": "docker compose down",
     "db:migrate": "pnpm --filter @cherri/api db:migrate",
     "db:seed": "pnpm --filter @cherri/api db:seed",
-    "ai:check": "pnpm --filter @cherri/api ai:check"
+    "ai:check": "pnpm --filter @cherri/api ai:check",
+    "build:apk": "pnpm --filter @cherri/mobile build:apk"
   },
   "devDependencies": {
     "turbo": "^2.11.10",

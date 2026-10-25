@@ -24,6 +24,8 @@ export function toPublicUser(user: User): PublicUser {
     timezone: user.timezone,
     dueDate: user.dueDate ? fromUTCDate(user.dueDate) : null,
     deliveryDate: user.deliveryDate ? fromUTCDate(user.deliveryDate) : null,
+    role: user.role,
+    hasPin: user.pinHash !== null,
     onboarded: user.onboardedAt !== null,
     createdAt: user.createdAt.toISOString(),
   };

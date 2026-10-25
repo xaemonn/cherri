@@ -3,6 +3,7 @@ import { addDays, diffDays, type ISODate } from '../dates';
 import { computeCycleStats, validCycleLengths, type CyclePrediction } from '../cycle/predict';
 import { sortPeriods, type PeriodRecord } from '../cycle/phases';
 import { POSTNATAL_DAYS } from '../pregnancy/care';
+import { pbacCycles } from './pbac';
 import { latestLabsByCode, type LabRecord, type LogRecord } from './types';
 import { bloodPressureReadings, classifyBloodPressure, pressureRise, rapidWeightGain } from './vitals';
 
@@ -200,6 +201,20 @@ function cycleFlags(input: RedFlagInput, periods: PeriodRecord[], bleedingLogs: 
     });
   }
 
+  // PBAC (Higham 1990): a measured score over 100 is heavy menstrual bleeding, stronger evidence than "heavy" flow taps.
+  const measured = pbacCycles(recentPeriods, logs, today).at(-1);
+  if (measured?.heavy) {
+    const clots = measured.clotsLarge > 0 ? ` You logged ${measured.clotsLarge} large clot${measured.clotsLarge === 1 ? '' : 's'}.` : '';
+    flags.push({
+      code: 'PBAC_HEAVY',
+      severity: 'WARNING',
+      title: `Heavy menstrual bleeding (PBAC ${measured.score})`,
+      detail: `Your blood loss for the period starting ${measured.start} is clinically classified as heavy (PBAC score ${measured.score}, about ${measured.estimatedMl} mL; heavy is over 100 points or 80 mL).${clots} Bleeding like this raises your risk of iron-deficiency anaemia and can be a sign of causes such as fibroids or polyps.`,
+      action: `Ask for haemoglobin and ferritin tests and a pelvic ultrasound. ${SEE_GYNAE}`,
+      relatedCondition: 'ANEMIA',
+    });
+  }
+
   const heavyPeriods = recentPeriods.filter((p) => {
     const end = p.endDate ?? addDays(p.startDate, 9);
     const days = logs.filter((l) => l.date >= p.startDate && l.date <= end);
@@ -207,7 +222,7 @@ function cycleFlags(input: RedFlagInput, periods: PeriodRecord[], bleedingLogs: 
     const heavySigns = days.filter((l) => hasSymptom(l, 'heavy_bleeding') || hasSymptom(l, 'clots')).length;
     return heavyDays >= 3 || heavySigns >= 2;
   });
-  if (heavyPeriods.length >= 2 || (heavyPeriods.length === 1 && recentPeriods.length === 1)) {
+  if (!measured?.heavy && (heavyPeriods.length >= 2 || (heavyPeriods.length === 1 && recentPeriods.length === 1))) {
     flags.push({
       code: 'HEAVY_BLEEDING',
       severity: 'WARNING',

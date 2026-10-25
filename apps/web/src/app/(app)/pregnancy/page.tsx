@@ -2,9 +2,10 @@
 
 import { addDays, formatDay, todayIn } from '@cherri/shared';
 import { useQueryClient } from '@tanstack/react-query';
-import { ExternalLink, Phone } from 'lucide-react';
-import { useState } from 'react';
+import { Baby, ExternalLink, HeartPulse, Landmark, ListChecks, Phone, TriangleAlert } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { FlagCard } from '@/components/insights/cards';
+import { Tabs } from '@/components/ui/tabs';
 import { BloodPressureChart } from '@/components/motherhood/bp-chart';
 import { DangerCheck } from '@/components/motherhood/danger-check';
 import { CarePlan, MotherhoodHero } from '@/components/motherhood/motherhood-hero';
@@ -74,12 +75,21 @@ function DateSetup({ stage }: { stage: 'PREGNANCY' | 'POSTPARTUM' }) {
 export default function PregnancyPage() {
   const { user } = useAuth();
   const care = useMotherhood();
+  const [tab, setTab] = useState<'overview' | 'check' | 'bp' | 'plan' | 'schemes'>(() =>
+    typeof window !== 'undefined' && window.location.hash === '#check' ? 'check' : 'overview',
+  );
+  // The hero's "Danger-sign check" button links to #check on this same page.
+  useEffect(() => {
+    const onHash = () => window.location.hash === '#check' && setTab('check');
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
 
   if (user && user.lifeStage !== 'PREGNANCY' && user.lifeStage !== 'POSTPARTUM') {
     return (
       <div>
         <PageHeader eyebrow="Pregnancy & baby" title="For pregnancy and the weeks after birth" />
-        <EmptyState emoji="🤰" title="Pregnant or just had a baby?">
+        <EmptyState title="Pregnant or just had a baby?">
           Switch your life stage in Settings and Cherri turns into your pregnancy companion: weekly care plan, danger-sign checks and blood pressure tracking.
           <div className="mt-4">
             <ButtonLink href="/settings" size="sm">
@@ -101,11 +111,25 @@ export default function PregnancyPage() {
   const lastWeight = weight.at(-1);
 
   return (
-    <div className="space-y-10">
-      <PageHeader eyebrow={stage === 'PREGNANCY' ? 'Pregnancy care' : 'After birth'} title={stage === 'PREGNANCY' ? 'You and your baby, week by week' : 'The first weeks, for both of you'}>
-        Check-ups, tests and free schemes for this stage, a danger-sign check you can trust, and your blood pressure in one place.
-      </PageHeader>
+    <div className="space-y-8">
+      <PageHeader eyebrow={stage === 'PREGNANCY' ? 'Pregnancy care' : 'After birth'} title={stage === 'PREGNANCY' ? 'You and your baby, week by week' : 'The first weeks, for both of you'} />
 
+      <Tabs
+        value={tab}
+        onChange={(t) => {
+          setTab(t);
+          window.history.replaceState(null, '', t === 'check' ? '#check' : window.location.pathname);
+        }}
+        tabs={[
+          { id: 'overview', label: 'Overview', icon: Baby },
+          { id: 'check', label: 'Danger-sign check', icon: TriangleAlert },
+          { id: 'bp', label: 'Blood pressure', icon: HeartPulse },
+          ...(status ? [{ id: 'plan' as const, label: 'Care plan', icon: ListChecks }] : []),
+          { id: 'schemes', label: 'Free schemes', icon: Landmark },
+        ]}
+      />
+      {tab === 'overview' && (
+      <>
       {status ? <MotherhoodHero status={status} /> : <DateSetup stage={stage} />}
 
       {flags.length > 0 && (
@@ -118,7 +142,10 @@ export default function PregnancyPage() {
           </div>
         </section>
       )}
+      </>
+      )}
 
+      {tab === 'check' && (
       <section id="check" className="scroll-mt-6">
         <SectionTitle eyebrow="1 minute" title="Danger-sign check" />
         <p className="mb-4 max-w-2xl text-sm text-ink-soft">
@@ -126,7 +153,9 @@ export default function PregnancyPage() {
         </p>
         <DangerCheck stage={stage} weeks={weeks} />
       </section>
+      )}
 
+      {tab === 'bp' && (
       <section>
         <SectionTitle eyebrow="Pre-eclampsia watch" title="Blood pressure" action={<ButtonLink href="/log" size="sm" variant="outline">Log a reading</ButtonLink>} />
         <Card>
@@ -143,14 +172,16 @@ export default function PregnancyPage() {
           )}
         </Card>
       </section>
+      )}
 
-      {status && (
+      {tab === 'plan' && status && (
         <section>
           <SectionTitle eyebrow={stage === 'PREGNANCY' ? 'India antenatal plan' : 'Postnatal plan'} title="Your care plan" />
           <CarePlan steps={status.steps} unit={stage === 'PREGNANCY' ? 'week' : 'day'} />
         </section>
       )}
 
+      {tab === 'schemes' && (
       <section>
         <SectionTitle eyebrow="Free for you" title="Government schemes and transport" />
         <div className="grid gap-4 md:grid-cols-2">
@@ -179,6 +210,7 @@ export default function PregnancyPage() {
           ))}
         </div>
       </section>
+      )}
     </div>
   );
 }

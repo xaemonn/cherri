@@ -9,17 +9,17 @@ import { useAuth } from '@/lib/auth';
 import { colors, fonts } from '@/lib/theme';
 
 const STAGES: Array<{ value: LifeStage; label: string; emoji: string }> = [
-  { value: 'CYCLE', label: 'Tracking my cycle', emoji: '🌙' },
-  { value: 'TTC', label: 'Trying to conceive', emoji: '🍼' },
-  { value: 'PREGNANCY', label: 'Pregnant', emoji: '🤰' },
-  { value: 'POSTPARTUM', label: 'Postpartum', emoji: '👶' },
-  { value: 'PERIMENOPAUSE', label: 'Perimenopause', emoji: '🌗' },
-  { value: 'MENOPAUSE', label: 'Menopause', emoji: '🌻' },
+  { value: 'CYCLE', label: 'Tracking my cycle', emoji: '' },
+  { value: 'TTC', label: 'Trying to conceive', emoji: '' },
+  { value: 'PREGNANCY', label: 'Pregnant', emoji: '' },
+  { value: 'POSTPARTUM', label: 'Postpartum', emoji: '' },
+  { value: 'PERIMENOPAUSE', label: 'Perimenopause', emoji: '' },
+  { value: 'MENOPAUSE', label: 'Menopause', emoji: '' },
 ];
 const TONES: Array<{ value: CompanionTone; label: string; emoji: string }> = [
-  { value: 'BESTIE', label: 'Bestie', emoji: '💅' },
-  { value: 'BIG_SIS', label: 'Big sis', emoji: '🫶' },
-  { value: 'CLINICAL', label: 'Straight facts', emoji: '🩺' },
+  { value: 'BESTIE', label: 'Bestie', emoji: '' },
+  { value: 'BIG_SIS', label: 'Big sis', emoji: '' },
+  { value: 'CLINICAL', label: 'Straight facts', emoji: '' },
 ];
 const LANGUAGES: Array<{ value: Language; label: string }> = [
   { value: 'en', label: 'English' },
@@ -148,7 +148,6 @@ export default function Onboarding() {
           <View style={styles.grid}>
             {STAGES.map((s) => (
               <Option key={s.value} selected={form.lifeStage === s.value} onPress={() => setForm({ ...form, lifeStage: s.value })}>
-                <Text style={{ fontSize: 28 }}>{s.emoji}</Text>
                 <Text style={styles.optionLabel}>{s.label}</Text>
               </Option>
             ))}
@@ -176,7 +175,7 @@ export default function Onboarding() {
           {TONES.map((t) => (
             <Option key={t.value} selected={form.companionTone === t.value} onPress={() => setForm({ ...form, companionTone: t.value })}>
               <Text style={styles.optionLabel}>
-                {t.emoji} {t.label}
+                {t.label}
               </Text>
             </Option>
           ))}
@@ -195,7 +194,7 @@ export default function Onboarding() {
 
       {current === 'consent' && (
         <View style={{ gap: 12 }}>
-          <T variant="title">Your data, your rules 🔒</T>
+          <T variant="title">Your data, your rules</T>
           {[
             'Your notes and chats are encrypted before they are stored.',
             'Cherri never sells your data or shows ads.',
@@ -203,7 +202,7 @@ export default function Onboarding() {
             'Export or delete everything anytime.',
           ].map((line) => (
             <Card key={line} style={{ padding: 14 }}>
-              <T>✅ {line}</T>
+              <T>{line}</T>
             </Card>
           ))}
           <View style={[styles.row, styles.consent]}>

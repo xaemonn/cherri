@@ -6,10 +6,10 @@ import { BlurWords } from '@/components/motion/reveal';
 import { moonLitPath } from '@/lib/svg';
 
 const STEPS = [
-  { n: '01', title: 'Log', accent: 'in seconds', text: 'Tap a few emojis, or just tell Cherri how you feel, in Hinglish if you like.', bg: '#2F3A24', h: 'md:h-[430px]' },
-  { n: '02', title: 'Cherri', accent: 'decodes', text: 'Predictions that learn, Pattern Radar and red flags, built on clinical guidelines.', bg: '#4A5A2B', h: 'md:h-[390px]' },
+  { n: '01', title: 'Log', accent: 'in seconds', text: 'Tap a few options, or just tell Cherri how you feel, in Hinglish if you like.', bg: '#4A2340', h: 'md:h-[430px]' },
+  { n: '02', title: 'Cherri', accent: 'decodes', text: 'Predictions that learn, Pattern Radar and red flags, built on clinical guidelines.', bg: '#8A3E66', h: 'md:h-[390px]' },
   { n: '03', title: 'Check', accent: 'early', text: 'PCOS, endometriosis, PMDD, anaemia and thyroid checks, pre-filled from your logs.', bg: '#74461F', h: 'md:h-[350px]' },
-  { n: '04', title: 'Walk in', accent: 'with evidence', text: 'Share one clinical page by QR. Your doctor sees months of data in a minute.', bg: '#33261C', h: 'md:h-[310px]' },
+  { n: '04', title: 'Walk in', accent: 'with evidence', text: 'Share one clinical page by QR. Your doctor sees months of data in a minute.', bg: '#2E2230', h: 'md:h-[310px]' },
 ];
 
 const R = 20;

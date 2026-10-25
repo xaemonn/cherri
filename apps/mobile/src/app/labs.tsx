@@ -49,7 +49,7 @@ export default function Labs() {
     setError(null);
     try {
       const report = await api.labs.upload(await formWithFile('file', uri, name));
-      Alert.alert('Decoded 🧪', report.summary);
+      Alert.alert('Decoded', report.summary);
       await Promise.all([queryClient.invalidateQueries({ queryKey: keys.labs }), invalidate()]);
     } catch (e) {
       setError(e);
@@ -89,9 +89,9 @@ export default function Labs() {
           </View>
         ) : (
           <>
-            <Button label="📸 Snap a photo" onPress={() => void fromCamera()} />
-            <Button label="🖼️ Choose from gallery" variant="outline" onPress={() => void fromGallery()} />
-            <Button label="📄 Upload a PDF" variant="outline" onPress={() => void fromFiles()} />
+            <Button label="Snap a photo" onPress={() => void fromCamera()} />
+            <Button label="Choose from gallery" variant="outline" onPress={() => void fromGallery()} />
+            <Button label="Upload a PDF" variant="outline" onPress={() => void fromFiles()} />
           </>
         )}
       </Card>

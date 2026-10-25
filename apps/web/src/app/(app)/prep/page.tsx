@@ -1,5 +1,8 @@
 'use client';
 
+import { MessageSquareText, Pill as PillIcon, UserRound } from 'lucide-react';
+import { Tabs } from '@/components/ui/tabs';
+
 import {
   FAMILY_CONDITION_LABELS,
   FAMILY_CONDITIONS,
@@ -15,7 +18,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { ArrowRight, Mic, Pill, Plus, Square, Trash2, Wand2 } from 'lucide-react';
 import { useState } from 'react';
 import { Button, ButtonLink } from '@/components/ui/button';
-import { Card, SectionTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Chip } from '@/components/ui/chip';
 import { FieldError, Input, Label, Textarea } from '@/components/ui/field';
 import { ErrorNote, PageHeader, Spinner } from '@/components/ui/misc';
@@ -74,10 +77,10 @@ function StoryEditor({ initial }: { initial: SymptomStoryDto | null }) {
         setText((t) => [t.trim(), transcript].filter(Boolean).join(' '));
         setSource('VOICE');
       } catch (error) {
-        toast(error instanceof Error ? error.message : 'Could not hear that.', '🎙️');
+        toast(error instanceof Error ? error.message : 'Could not hear that.');
       }
     } else {
-      voice.start().catch(() => toast('Microphone access is blocked.', '🎙️'));
+      voice.start().catch(() => toast('Microphone access is blocked.'));
     }
   }
 
@@ -88,7 +91,7 @@ function StoryEditor({ initial }: { initial: SymptomStoryDto | null }) {
       setDraft(result.structured);
       setSafety(result.safety);
     } catch (error) {
-      toast(error instanceof Error ? error.message : 'Could not organise your story.', '😕');
+      toast(error instanceof Error ? error.message : 'Could not organise your story.');
     } finally {
       setBusy(null);
     }
@@ -101,9 +104,9 @@ function StoryEditor({ initial }: { initial: SymptomStoryDto | null }) {
       setSaved(await api.story.save({ text, structured: draft, source }));
       await queryClient.invalidateQueries({ queryKey: keys.story });
       await queryClient.invalidateQueries({ queryKey: ['report'] });
-      toast('Saved to your doctor report', '📋');
+      toast('Saved to your doctor report');
     } catch (error) {
-      toast(error instanceof Error ? error.message : 'Could not save.', '😕');
+      toast(error instanceof Error ? error.message : 'Could not save.');
     } finally {
       setBusy(null);
     }
@@ -119,7 +122,7 @@ function StoryEditor({ initial }: { initial: SymptomStoryDto | null }) {
     <Card sticker>
       <h2 className="text-2xl font-semibold">Your story, in your words</h2>
       <p className="mt-1 text-sm text-ink-soft">
-        Doctors take a history in a set order. Tell yours however it comes out, in English, Hindi, Hinglish or Kannada, and Cherri sorts it for you. It only rearranges your words: anything it can’t find in what you said stays blank.
+        Doctors take a history in a set order.
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
         {STORY_PROMPTS.map((p) => (
@@ -195,7 +198,7 @@ function StoryEditor({ initial }: { initial: SymptomStoryDto | null }) {
                   setText('');
                   setDraft(null);
                   await queryClient.invalidateQueries({ queryKey: keys.story });
-                  toast('Story deleted', '🗑️');
+                  toast('Story deleted');
                 }}
               >
                 <Trash2 className="size-4" /> Delete story
@@ -240,7 +243,7 @@ function MedicinesCard() {
   async function toggle(med: MedicationDto) {
     await api.medications.update(med.id, { active: !med.active });
     await refresh();
-    toast(med.active ? `${med.name} marked as stopped` : `${med.name} marked as current`, '💊');
+    toast(med.active ? `${med.name} marked as stopped` : `${med.name} marked as current`);
   }
 
   return (
@@ -249,7 +252,7 @@ function MedicinesCard() {
         <Pill className="size-6" /> Medicines & supplements
       </h2>
       <p className="mt-1 text-sm text-ink-soft">
-        Include iron or calcium tablets, painkillers you take for periods, the pill and any home remedies. Doctors always ask, and “none listed” isn’t the same as “none taken”.
+        Include iron or calcium tablets, painkillers you take for periods, the pill and any home remedies.
       </p>
       <ul className="mt-4 space-y-2">
         {meds.data?.map((med) => (
@@ -333,16 +336,16 @@ function BackgroundForm({ initial }: { initial: HealthBackground }) {
         surgeries: form.surgeries?.trim() || null,
       });
       await Promise.all([queryClient.invalidateQueries({ queryKey: keys.background }), queryClient.invalidateQueries()]);
-      toast('Background saved', '✅');
+      toast('Background saved');
     } catch (e) {
-      toast(e instanceof Error ? e.message : 'Could not save.', '😕');
+      toast(e instanceof Error ? e.message : 'Could not save.');
     }
   }
 
   return (
     <Card>
       <h2 className="text-2xl font-semibold">Your background</h2>
-      <p className="mt-1 text-sm text-ink-soft">The questions a doctor asks at a first visit, answered once. Your age at your first period also makes Cherri’s cycle checks fairer for your age.</p>
+      <p className="mt-1 text-sm text-ink-soft">The questions a doctor asks at a first visit, answered once.</p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <label>
           <Label hint="leave blank if you don’t remember">Age at your first period</Label>
@@ -381,22 +384,29 @@ function BackgroundForm({ initial }: { initial: HealthBackground }) {
 }
 
 export default function VisitPrepPage() {
+  const [tab, setTab] = useState<'story' | 'medicines' | 'background'>('story');
   return (
     <div className="space-y-6">
-      <PageHeader eyebrow="Visit prep" title="Get heard in a ten-minute visit">
-        Your story, your medicines and your background, organised the way a doctor reads them. Everything here goes into your doctor report and is encrypted before it’s stored.
-      </PageHeader>
-      <StoryCard />
-      <div className="grid items-start gap-6 lg:grid-cols-2">
-        <MedicinesCard />
-        <BackgroundCard />
-      </div>
-      <section>
-        <SectionTitle eyebrow="Ready?" title="See it in your report" />
-        <ButtonLink href="/report" size="lg" variant="olive">
-          Open my doctor report <ArrowRight className="size-5" />
+      <PageHeader eyebrow="Visit prep" title="Get heard in a ten-minute visit" />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Tabs
+          value={tab}
+          onChange={setTab}
+          tabs={[
+            { id: 'story', label: 'Your story', icon: MessageSquareText },
+            { id: 'medicines', label: 'Medicines', icon: PillIcon },
+            { id: 'background', label: 'Background', icon: UserRound },
+          ]}
+        />
+        <ButtonLink href="/report" variant="olive" size="sm">
+          Open my report <ArrowRight className="size-4" />
         </ButtonLink>
-      </section>
+      </div>
+      <div className="max-w-4xl">
+        {tab === 'story' && <StoryCard />}
+        {tab === 'medicines' && <MedicinesCard />}
+        {tab === 'background' && <BackgroundCard />}
+      </div>
     </div>
   );
 }

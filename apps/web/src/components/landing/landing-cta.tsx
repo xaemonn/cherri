@@ -7,7 +7,7 @@ import { Magnetic } from '@/components/motion/reveal';
 import { Button, ButtonLink } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth';
 
-/** Signed-in visitors get "Open app"; everyone else can start as a guest in one tap. */
+/** Signed-in visitors get "Open app"; everyone else goes to log in, or starts as a guest in one tap. */
 export function LandingCta({ size = 'lg', light = false }: { size?: 'md' | 'lg'; light?: boolean }) {
   const { status, continueAsGuest } = useAuth();
   const router = useRouter();
@@ -26,26 +26,26 @@ export function LandingCta({ size = 'lg', light = false }: { size?: 'md' | 'lg';
   return (
     <div className="flex flex-wrap items-center gap-3">
       <Magnetic>
-        <Button
-          variant="olive"
-          size={size}
-          disabled={busy}
-          onClick={async () => {
-            setBusy(true);
-            try {
-              await continueAsGuest();
-              router.push('/onboarding');
-            } catch {
-              setBusy(false);
-            }
-          }}
-        >
-          {busy ? 'Setting up…' : 'Start free, no email needed'} <ArrowRight className="size-5" />
-        </Button>
+        <ButtonLink href="/login" variant="olive" size={size}>
+          Log in or sign up <ArrowRight className="size-5" />
+        </ButtonLink>
       </Magnetic>
-      <ButtonLink href="/login" variant={light ? 'cream' : 'outline'} size={size}>
-        Log in
-      </ButtonLink>
+      <Button
+        variant={light ? 'cream' : 'outline'}
+        size={size}
+        disabled={busy}
+        onClick={async () => {
+          setBusy(true);
+          try {
+            await continueAsGuest();
+            router.push('/onboarding');
+          } catch {
+            setBusy(false);
+          }
+        }}
+      >
+        {busy ? 'Setting up…' : 'Try as a guest'}
+      </Button>
     </div>
   );
 }

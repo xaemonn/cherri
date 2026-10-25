@@ -21,7 +21,7 @@ export const PHASE_GUIDES: Record<CyclePhase, PhaseGuide> = {
     phase: 'MENSTRUAL',
     name: 'Menstrual phase',
     vibe: 'Reset Era',
-    emoji: '🩸',
+    emoji: '',
     description: 'Hormones are at their lowest. It’s normal to want rest, warmth and comfort food.',
     tips: [
       { kind: 'NOURISH', text: 'Pair iron with vitamin C, like palak dal with a squeeze of lemon, or poha with peanuts and lemon.', evidence: 'STRONG' },
@@ -34,7 +34,7 @@ export const PHASE_GUIDES: Record<CyclePhase, PhaseGuide> = {
     phase: 'FOLLICULAR',
     name: 'Follicular phase',
     vibe: 'Glow-Up Era',
-    emoji: '🌱',
+    emoji: '',
     description: 'Oestrogen is rising. Many people feel their energy, mood and focus lift.',
     tips: [
       { kind: 'NOURISH', text: 'Protein-rich breakfasts like besan chilla, eggs or sprouts keep rising energy steady.', evidence: 'MODERATE' },
@@ -46,7 +46,7 @@ export const PHASE_GUIDES: Record<CyclePhase, PhaseGuide> = {
     phase: 'OVULATORY',
     name: 'Ovulation',
     vibe: 'Main Character Era',
-    emoji: '✨',
+    emoji: '',
     description: 'An egg is released. Confidence and social energy often peak.',
     tips: [
       { kind: 'KNOW', text: 'This is your most fertile window. Use contraception if you’re avoiding pregnancy.', evidence: 'STRONG' },
@@ -58,7 +58,7 @@ export const PHASE_GUIDES: Record<CyclePhase, PhaseGuide> = {
     phase: 'LUTEAL',
     name: 'Luteal phase',
     vibe: 'Cozy Era',
-    emoji: '🌙',
+    emoji: '',
     description: 'Progesterone rises, then both hormones fall before your period. Slowing down is valid.',
     tips: [
       { kind: 'NOURISH', text: 'Cravings are real. Your body uses a bit more energy now. Try roasted chana, ragi, fruit with peanut butter or a little dark chocolate.', evidence: 'MODERATE' },

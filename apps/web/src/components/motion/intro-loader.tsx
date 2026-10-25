@@ -91,7 +91,7 @@ export function IntroLoader() {
             </svg>
           </mask>
         </defs>
-        <rect width="100%" height="100%" fill="#2F3A24" mask="url(#intro-arch)" />
+        <rect width="100%" height="100%" fill="#4A2340" mask="url(#intro-arch)" />
         {/* a thin ochre outline rides the edge of the opening arch */}
         <svg x="50%" y="50%" overflow="visible">
           <motion.path
@@ -131,7 +131,7 @@ export function IntroLoader() {
             ))}
           </span>
           <motion.p
-            className="mt-3 font-display text-lg text-cream/60 italic sm:text-xl"
+            className="mt-3 font-display text-lg text-cream/60 sm:text-xl"
             initial={{ opacity: 0, filter: 'blur(8px)' }}
             animate={{ opacity: 1, filter: 'blur(0px)' }}
             transition={{ duration: 0.9, delay: 0.9 }}
@@ -158,7 +158,7 @@ export function IntroLoader() {
                 animate={i < grown ? { scale: 1, rotate: 0 } : { scale: 0 }}
                 transition={{ type: 'spring', stiffness: 260, damping: 14 }}
               >
-                <path d={i % 2 ? 'M10 0C4 6 4 14 10 20c6-6 6-14 0-20Z' : 'M10 20C4 14 4 6 10 0c6 6 6 14 0 20Z'} fill={i % 2 ? '#A4B26B' : '#CDD3AE'} />
+                <path d={i % 2 ? 'M10 0C4 6 4 14 10 20c6-6 6-14 0-20Z' : 'M10 20C4 14 4 6 10 0c6 6 6 14 0 20Z'} fill={i % 2 ? '#D69AB5' : '#CDD3AE'} />
               </motion.svg>
             ))}
             <motion.span className="absolute top-1/2 -translate-x-1/2 translate-y-[-85%]" style={{ left: width }}>

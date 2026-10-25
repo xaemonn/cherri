@@ -10,7 +10,7 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { useHelp } from '@/lib/queries';
 
-const KIND_LABELS = { GYNAECOLOGY: { label: 'Women’s health', emoji: '🩺', bg: '#E6E9D3' }, HOSPITAL: { label: 'Hospital', emoji: '🏥', bg: '#DFE7E3' }, CLINIC: { label: 'Clinic', emoji: '🏠', bg: '#F3E6C6' } } as const;
+const KIND_LABELS = { GYNAECOLOGY: { label: 'Women’s health', emoji: '', bg: '#F8E6EE' }, HOSPITAL: { label: 'Hospital', emoji: '', bg: '#DFE7E3' }, CLINIC: { label: 'Clinic', emoji: '', bg: '#F3E6C6' } } as const;
 
 export default function CarePage() {
   const help = useHelp();
@@ -76,7 +76,7 @@ export default function CarePage() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <span className="inline-flex rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: kind.bg }}>
-                        {kind.emoji} {kind.label}
+                        {kind.label}
                       </span>
                       <h3 className="mt-2 text-lg leading-snug font-semibold">{p.name}</h3>
                       {p.address && <p className="text-sm text-ink-soft">{p.address}</p>}

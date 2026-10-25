@@ -5,6 +5,7 @@ import { AiModule } from './ai/ai.module';
 import { AuthModule } from './auth/auth.module';
 import { CareModule } from './care/care.module';
 import { CoreModule } from './common/core.module';
+import { ConsultModule } from './consult/consult.module';
 import { AllExceptionsFilter } from './common/exception.filter';
 import { RequestLoggerMiddleware } from './common/request-logger.middleware';
 import { ENV, type Env } from './config/env';
@@ -13,6 +14,7 @@ import { HealthController } from './health.controller';
 import { InsightsModule } from './insights/insights.module';
 import { KnowledgeModule } from './knowledge/knowledge.module';
 import { LabsModule } from './labs/labs.module';
+import { RemindersModule } from './reminders/reminders.module';
 import { ReportsModule } from './reports/reports.module';
 import { SafetyModule } from './safety/safety.module';
 import { ScreeningsModule } from './screenings/screenings.module';
@@ -42,6 +44,8 @@ import { VisitModule } from './visit/visit.module';
     VisitModule,
     SafetyModule,
     CareModule,
+    ConsultModule,
+    RemindersModule,
     DemoModule,
   ],
   controllers: [HealthController],

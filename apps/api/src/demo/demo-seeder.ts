@@ -59,6 +59,7 @@ export async function seedDemoHistory(
             systolic: log.systolic ?? null,
             diastolic: log.diastolic ?? null,
             weightKg: log.weightKg ?? null,
+            ...(log.pbac && { pbac: log.pbac }),
             notes: log.notes ? encrypt(log.notes) : null,
             symptoms: { create: log.symptoms.map((s) => ({ code: s.code, severity: s.severity })) },
           },

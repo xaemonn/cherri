@@ -41,7 +41,7 @@ function Result({ record, onRetake }: { record: ScreeningRecord; onRetake: () =>
           <T variant="h3">Tests to ask about</T>
           {result.suggestedTests.map((t) => (
             <T key={t} variant="small">
-              🧪 {t}
+              {t}
             </T>
           ))}
           <T style={{ fontFamily: fonts.bold, marginTop: 4 }}>See: {result.specialist}</T>
@@ -119,7 +119,7 @@ export default function CheckFlow() {
             <Card sticker style={{ gap: 14 }}>
               <T variant="h2">{question.text}</T>
               {question.hint && <T variant="small">{question.hint}</T>}
-              {data.prefill[question.id] && <Text style={styles.noticed}>✨ Cherri noticed: {data.prefill[question.id]!.reason}</Text>}
+              {data.prefill[question.id] && <Text style={styles.noticed}>Cherri noticed: {data.prefill[question.id]!.reason}</Text>}
               <View style={{ flexDirection: 'row', gap: 10 }}>
                 {[true, false].map((value) => (
                   <Pressable
