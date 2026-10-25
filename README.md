@@ -10,7 +10,7 @@ Project developed for the recHERsion Hackathon.
 
 - Demo Video: https://drive.google.com/file/d/1uPROPVRHD_KjauUyjZ7XHZrVantbhXav/view?usp=sharing
 - Live Web Deployment: [INSERT DEPLOYMENT URL HERE]
-- Mobile App Preview: See Section 2 for local Expo and standalone APK instructions.
+- Mobile App Preview: See *Step 4: Run the Mobile App* in Section 2 for Expo Go, standalone APK and install-from-browser instructions.
 
 ---
 
@@ -51,11 +51,23 @@ Cherri bridges the gap between everyday experience and clinical decision-making:
 - Modern web browser (Chrome, Safari, Edge, Firefox)
 
 ### Step 1: Environment Setup
-Clone the repository and install workspace dependencies:
+Clone the repository, install workspace dependencies and create the environment files:
 
 ```bash
 pnpm install
+
+cp apps/api/.env.example apps/api/.env
+cp apps/web/.env.example apps/web/.env.local
 ```
+
+Open `apps/api/.env` and fill in the two required secrets. Generate each one with the command next to it:
+
+| Variable | Generate with |
+|---|---|
+| `JWT_ACCESS_SECRET` | `node -e "console.log(require('crypto').randomBytes(48).toString('base64'))"` |
+| `ENCRYPTION_KEY` | `node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"` |
+
+The AI keys (`GROQ_API_KEY`, `GEMINI_API_KEY`) are optional. They power Ask Cherri, voice notes and reading lab-report photos; without them the app runs in offline mode.
 
 ### Step 2: Database Initialization
 Start the PostgreSQL 16 container, apply Prisma migrations, and seed pre-configured clinical evaluation accounts:
@@ -83,6 +95,53 @@ pnpm dev
 
 Open `http://localhost:3100` in your browser.
 
+### Step 4 (Optional): Run the Mobile App
+
+The React Native app (`apps/mobile`) uses the same API and accounts as the website. Keep `pnpm dev` running for all three options below.
+
+**Option A: Expo Go (quickest way to try it)**
+
+1. Install **Expo Go** on your phone from the Play Store or App Store.
+2. Connect the phone to the same Wi-Fi network as your computer.
+3. In a second terminal, run:
+   ```bash
+   pnpm dev:mobile
+   ```
+4. Scan the QR code shown in the terminal: with the Expo Go app on Android, or with the Camera app on iPhone.
+5. Log in with a demo account, for example `demo@cherri.app` / `cherri-demo-2026`.
+
+The app finds the API automatically at your computer's address on port 4100. If it cannot connect, allow Node.js through your firewall, or set the address yourself:
+
+```bash
+# macOS / Linux / Git Bash
+EXPO_PUBLIC_API_URL=http://<your-computer-ip>:4100/api pnpm dev:mobile
+
+# Windows PowerShell
+$env:EXPO_PUBLIC_API_URL="http://<your-computer-ip>:4100/api"; pnpm dev:mobile
+```
+
+**Option B: Standalone Android APK (no Expo Go needed)**
+
+The APK is built in the cloud by Expo Application Services (EAS), so Android Studio is not required.
+
+1. In `apps/mobile/eas.json`, set `EXPO_PUBLIC_API_URL` under `build.preview.env` to an address the phone can reach: your deployed API (`https://<your-api-host>/api`), or `http://<your-computer-ip>:4100/api` for testing on the same Wi-Fi.
+2. Install the EAS command-line tool, log in with a free Expo account and start the build:
+   ```bash
+   npm install -g eas-cli
+   eas login
+   pnpm build:apk
+   ```
+   The first build asks to create an EAS project and an Android keystore; accept both.
+3. When the build finishes, open its download link (or scan its QR code) on your Android phone and install the APK. Android may ask you to allow installing apps from this source.
+
+**Option C: Install the website as an app**
+
+On the phone (same Wi-Fi), open `http://<your-computer-ip>:3100/app` and follow the on-screen steps: in Chrome on Android, tap **⋮** → **Install app**; in Safari on iPhone, tap **Share** → **Add to Home Screen**.
+
+To find your computer's IP address, run `ipconfig` on Windows (look for **IPv4 Address**) or `ipconfig getifaddr en0` on macOS.
+
+**What's in the mobile app:** the Home, Log (including the PBAC blood-loss counter), Ask Cherri and Insights tabs, and under **More**: Consult a doctor, Medicine guardian, Accident help, Lab decoder, Health checks, Doctor report, Learn & myths, Find care, Pregnancy & baby (for pregnancy accounts) and Settings. The **Quick exit** button on Home and More covers the app with a weather screen until the privacy PIN (set in Settings) is entered.
+
 ---
 
 ### Pre-Configured Evaluation Personas
@@ -107,7 +166,7 @@ To test the system immediately without manual onboarding, use the seeded account
    - **Medicine Guardian (`/meds`):** Select *Livogen (Iron)*, *Shelcal 500 (Calcium)*, and *Thyronorm*. Observe the dynamic conflict cards explaining that calcium blocks iron absorption (requiring a 4-hour spacing window) and detailing thyroid fasting rules. Test the *Missed-Pill Helper* with 30 hours to see updated FSRH clinical guidance.
    - **Emergency Contraceptive Triage (`/ec`):** Select *Condom broke or slipped* from *Yesterday*. View the real-time conception risk band and live countdown timers for Levonorgestrel (72h), Ulipristal (120h), and Copper IUD.
    - **Consult a Doctor (`/consult`):** Select *Lab report review*. Test the emergency gate by typing *"I am soaking 2 pads an hour and feel dizzy"*—observe the immediate Critical Symptoms trap with 112/108 emergency buttons. Replace it with routine text or a voice note, review the attached 90-day clinical snapshot, agree to the consent terms, and send.
-   - **Screen Shield (`Esc` twice or `Alt + Q`):** Press `Esc` twice anywhere. The screen instantly switches to a neutral weather cover in 15 milliseconds, the tab title becomes *Local Weather*, and the session locks behind a 4-digit PIN. Unlock using `2580` or your account password.
+   - **Screen Shield (`Esc` twice or `Alt + Q`):** Press `Esc` twice anywhere. The screen instantly switches to a neutral weather cover in 15 milliseconds, the tab title becomes *Local Weather*, and the session locks behind a 4-digit PIN. Unlock with the account password (`cherri-demo-2026`), or with a 4-digit PIN if you set one in *Settings → Privacy & shield*.
    - **Language Switcher:** In the top navigation, toggle between **English** and **हिंदी**. Observe the immediate transition to authentic, pure Devanagari typography (`Noto Sans Devanagari`).
 
 2. **Doctor View (`doctor@cherri.app`):**
