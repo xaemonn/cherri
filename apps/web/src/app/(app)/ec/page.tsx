@@ -94,7 +94,6 @@ function Countdown({ option, hoursSince }: { option: EcOption; hoursSince: numbe
     <Card className={cn('flex flex-col', !option.available && 'opacity-60')}>
       <p className="text-xs font-semibold tracking-[0.18em] text-ink-faint uppercase">{option.windowHours === 72 ? 'Within 72 hours' : 'Within 5 days (120 h)'}</p>
       <h3 className="mt-1 text-xl font-medium">{option.name}</h3>
-      <p className="text-sm text-ink-soft">{option.examples}</p>
       <p className={cn('mt-4 font-display text-3xl font-medium tabular-nums', option.available ? 'text-ink' : 'text-cherry-deep')}>{fmtLeft(option.hoursLeft)}</p>
       <div className="relative mt-2 h-3 overflow-hidden rounded-full bg-cream-deep" role="meter" aria-valuemin={0} aria-valuemax={option.windowHours} aria-valuenow={Math.min(hoursSince, option.windowHours)} aria-label="Time used">
         {option.id === 'LNG' && (
@@ -114,11 +113,17 @@ function Countdown({ option, hoursSince }: { option: EcOption; hoursSince: numbe
         </div>
       )}
       <p className={cn('mt-3 rounded-2xl px-3 py-2 text-sm font-medium', option.available ? 'bg-olive-soft text-olive-deep' : 'bg-cherry-soft text-cherry-deep')}>{option.efficacy}</p>
-      <ul className="mt-3 space-y-1 text-sm text-ink-soft">
-        {option.notes.map((n) => (
-          <li key={n}>• {n}</li>
-        ))}
-      </ul>
+      <details className="group mt-auto pt-3">
+        <summary className="flex cursor-pointer list-none items-center gap-1 text-sm font-semibold text-olive-deep">
+          Where to get it & notes <span className="transition-transform group-open:rotate-180">⌄</span>
+        </summary>
+        <p className="mt-2 text-sm text-ink-soft">{option.examples}</p>
+        <ul className="mt-2 space-y-1 text-sm text-ink-soft">
+          {option.notes.map((n) => (
+            <li key={n}>• {n}</li>
+          ))}
+        </ul>
+      </details>
     </Card>
   );
 }

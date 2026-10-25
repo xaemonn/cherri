@@ -111,15 +111,23 @@ function ClaimChecker() {
 
   const verdict = result ? verdictStyles[result.verdict] : null;
   return (
-    <Card tone="ink">
-      <p className="text-xs font-semibold tracking-[0.18em] text-olive uppercase">Fact-checker</p>
-      <h3 className="mt-1 text-2xl font-semibold text-cream">Saw something on Insta? Check it.</h3>
+    <Card tone="ink" className="h-full">
+      <h3 className="text-xl font-semibold text-cream">Paste a claim and Cherri checks it against trusted sources.</h3>
       <form onSubmit={check} className="mt-4 flex gap-2">
         <Input value={claim} onChange={(e) => setClaim(e.target.value)} placeholder="e.g. jeera water cures PCOS" className="border-transparent" />
         <Button variant="olive" type="submit" disabled={loading} aria-label="Check claim">
           {loading ? <Spinner className="size-4" /> : <Search className="size-5" />}
         </Button>
       </form>
+      {!result && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {['Jeera water cures PCOS', 'Papaya causes miscarriage', 'You can’t get pregnant on your period'].map((ex) => (
+            <button key={ex} type="button" onClick={() => setClaim(ex)} className="rounded-full border border-cream/25 px-3 py-1.5 text-xs font-medium text-cream/85 hover:bg-cream/10">
+              {ex}
+            </button>
+          ))}
+        </div>
+      )}
       {error !== null && (
         <div className="mt-3">
           <ErrorNote error={error} />
@@ -154,17 +162,18 @@ export default function LearnPage() {
 
   return (
     <div className="space-y-10">
-      <PageHeader eyebrow="Learn" title="Body literacy, minus the lecture">
-        Bust myths your aunties swear by, check claims from the internet, and read short guides from WHO, NHS and Government of India sources.
-      </PageHeader>
+      <PageHeader eyebrow="Learn" title="Body literacy, minus the lecture" />
 
-      <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
-        <section>
-          <SectionTitle eyebrow="Swipe game" title="Myth or fact?" />
-          {myths.data ? <MythDeck myths={myths.data} /> : <PageLoader />}
+      <div className="grid items-stretch gap-6 lg:grid-cols-2">
+        <section className="flex flex-col">
+          <SectionTitle eyebrow="Fact-checker" title="Saw something online?" />
+          <div className="flex-1">
+            <ClaimChecker />
+          </div>
         </section>
-        <section className="lg:pt-12">
-          <ClaimChecker />
+        <section className="flex flex-col">
+          <SectionTitle eyebrow="Common myths" title="Myth or fact?" />
+          <div className="flex-1">{myths.data ? <MythDeck myths={myths.data} /> : <PageLoader />}</div>
         </section>
       </div>
 

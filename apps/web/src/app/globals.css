@@ -1,44 +1,47 @@
 @import "tailwindcss";
 
-/* Cherri design tokens: berry, blush, lavender and gold on a warm white. */
+/* Cherri design tokens: Modern calming bluish palette with soft lavender and rose accents.
+   Coolors palette: #cdb4db (lavender), #ffc8dd (soft pink), #ffafcc (rose), #bde0fe (powder blue), #a2d2ff (sky blue).
+   Leaning toward the bluish side with deep oceanic navy ink. */
 @theme {
-  --color-cream: #faf5f3;
-  --color-cream-deep: #f2e7e8;
-  --color-paper: #fffcfb;
-  --color-ink: #2e2230;
-  --color-ink-soft: #6e5a6b;
-  --color-ink-faint: #a897a6;
-  --color-line: #ecdde0;
+  --color-cream: #f0f6fc;
+  --color-cream-deep: #e1eef9;
+  --color-paper: #ffffff;
+  --color-ink: #112239;
+  --color-ink-soft: #435b75;
+  --color-ink-faint: #7f99b7;
+  --color-line: #d1e3f5;
 
-  --color-olive: #d69ab5;
-  --color-olive-soft: #f8e6ee;
-  --color-olive-deep: #8a3e66;
-  --color-forest: #4a2340;
-  --color-clay: #e3a487;
-  --color-clay-soft: #fbebe2;
-  --color-clay-deep: #8a4b30;
-  --color-ochre: #d4a65a;
-  --color-ochre-soft: #f8eed8;
-  --color-ochre-deep: #7a5a1e;
-  --color-dusk: #a99bd6;
-  --color-dusk-soft: #efebfa;
-  --color-dusk-deep: #4f4486;
-  --color-sage: #9cc5b4;
-  --color-sage-soft: #e6f2ec;
-  --color-sage-deep: #2f5e4e;
-  --color-cherry: #b4354a;
-  --color-cherry-soft: #fbe4e7; /* sand: a light red tint would read pink */
-  --color-cherry-deep: #7a1e2e;
+  --color-olive: #60a5fa;
+  --color-olive-soft: #e0f0fe;
+  --color-olive-deep: #1d4ed8;
+  --color-forest: #0c1d35;
+  --color-clay: #ffafcc;
+  --color-clay-soft: #fef0f6;
+  --color-clay-deep: #b82d60;
+  --color-ochre: #a2d2ff;
+  --color-ochre-soft: #ecf5ff;
+  --color-ochre-deep: #1d5ca6;
+  --color-dusk: #cdb4db;
+  --color-dusk-soft: #f4eef9;
+  --color-dusk-deep: #5b3e7a;
+  --color-sage: #bde0fe;
+  --color-sage-soft: #eaf4fe;
+  --color-sage-deep: #1b538c;
+  --color-cherry: #e04a74;
+  --color-cherry-soft: #ffedf3;
+  --color-cherry-deep: #8f1737;
 
-  --font-display: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-jakarta), var(--font-devanagari), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), var(--font-devanagari), ui-sans-serif, system-ui, sans-serif;
+  --font-devanagari: var(--font-devanagari), 'Noto Sans Devanagari', 'Mukta', 'Devanagari MT', sans-serif;
 
   --radius-card: 26px;
   --radius-arch: 999px 999px 26px 26px;
 
-  --shadow-lift: 0 1px 2px rgb(46 34 48 / 0.05), 0 8px 20px -12px rgb(46 34 48 / 0.22);
-  --shadow-lift-lg: 0 2px 4px rgb(46 34 48 / 0.04), 0 22px 44px -24px rgb(46 34 48 / 0.35);
-  --shadow-soft: 0 18px 40px -26px rgb(46 34 48 / 0.3);
+  --shadow-lift: 0 1px 2px rgb(17 34 57 / 0.05), 0 8px 20px -12px rgb(17 34 57 / 0.18);
+  --shadow-lift-lg: 0 2px 4px rgb(17 34 57 / 0.04), 0 22px 44px -24px rgb(17 34 57 / 0.25);
+  --shadow-soft: 0 18px 40px -26px rgb(17 34 57 / 0.22);
 
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
 
@@ -90,16 +93,26 @@
     min-height: 100dvh;
   }
 
-  /* Linen texture, barely there. */
+  /* Pure Devanagari font rules for Hindi mode */
+  html[lang="hi"], html[lang="hi"] body {
+    font-family: var(--font-devanagari);
+    letter-spacing: 0.01em;
+  }
+  html[lang="hi"] h1, html[lang="hi"] h2, html[lang="hi"] h3, html[lang="hi"] h4 {
+    font-family: var(--font-devanagari);
+    letter-spacing: 0;
+  }
+
+  /* Cool mist texture, subtle and modern. */
   body::before {
     content: "";
     position: fixed;
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    opacity: 0.28;
+    opacity: 0.16;
     mix-blend-mode: multiply;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.35  0 0 0 0 0.3  0 0 0 0 0.2  0 0 0 0.08 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.15  0 0 0 0 0.28  0 0 0 0 0.52  0 0 0 0.05 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
   }
 
   body > * {
@@ -113,7 +126,7 @@
   }
 
   ::selection {
-    background: var(--color-olive);
+    background: var(--color-sage);
     color: var(--color-ink);
   }
 
@@ -134,7 +147,7 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: var(--color-olive-deep);
+    background: var(--color-olive);
     border: 3px solid var(--color-cream);
     border-radius: 999px;
   }
@@ -150,7 +163,6 @@
   .scrollbar-none::-webkit-scrollbar {
     display: none;
   }
-  /* The one emphasised phrase in a headline: colour only, no italics. */
   .accent-italic {
     font-style: normal;
   }
@@ -159,7 +171,6 @@
   }
 }
 
-/* Keyframes used through arbitrary animate-[…] classes live outside @theme so they are always emitted. */
 @keyframes sunrise {
   0% { bottom: -3rem; opacity: 0.2; }
   55% { bottom: 1.6rem; opacity: 1; }
@@ -187,19 +198,16 @@
   100% { transform: translate(0, 0) rotate(0deg); }
 }
 
-/* Repeat visits: the inline script marks the intro as seen before first paint. */
 html[data-intro="seen"] .intro-overlay {
   display: none;
 }
 
-/* The custom scroller replaces the page scrollbar on desktop; inner scroll areas keep theirs. */
 html.scroller-custom {
   scrollbar-width: none;
 }
 html.scroller-custom::-webkit-scrollbar {
   display: none;
 }
-
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -214,7 +222,7 @@ html.scroller-custom::-webkit-scrollbar {
   html, body { background: white; }
 }
 
-/* Screen shield: one attribute flip hides the whole app and shows the decoy in the same frame. */
+/* Screen shield */
 .shield-layer {
   display: none;
 }
@@ -233,9 +241,8 @@ html[data-shield="on"] .shield-layer {
   background: #fff;
 }
 
-/* Something new just appeared: a short ring pulse so it can't be mistaken for old content. */
 @keyframes attention {
-  0% { box-shadow: 0 0 0 0 var(--attention, rgb(74 90 43 / 0.55)); }
+  0% { box-shadow: 0 0 0 0 var(--attention, rgb(29 78 216 / 0.55)); }
   70% { box-shadow: 0 0 0 14px rgb(0 0 0 / 0); }
   100% { box-shadow: 0 0 0 0 rgb(0 0 0 / 0); }
 }

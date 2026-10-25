@@ -4,6 +4,8 @@ import { firstName, formatDay, greeting, moodScale, phaseColors, relativeDay, SC
 import {
   ArrowRight,
   BellRing,
+  CalendarHeart,
+  ChevronDown,
   ClipboardCheck,
   ClipboardList,
   Droplets,
@@ -23,21 +25,19 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'motion/react';
 import Link from 'next/link';
 import { useState } from 'react';
-import { Blob, Sticker } from '@/components/brand/decor';
+import { Blob } from '@/components/brand/decor';
 import { CycleWheel } from '@/components/cycle/cycle-wheel';
-import { TalkToLog } from '@/components/log/talk-to-log';
-import { Appear } from '@/components/ui/appear';
-import { ScaleIcon } from '@/components/ui/scale-icon';
 import { MotherhoodHero } from '@/components/motherhood/motherhood-hero';
+import { Appear } from '@/components/ui/appear';
 import { Button, ButtonLink } from '@/components/ui/button';
-import { Card, SectionTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { ErrorNote, PageLoader } from '@/components/ui/misc';
+import { ScaleIcon } from '@/components/ui/scale-icon';
 import { useToast } from '@/components/ui/toast';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { cn } from '@/lib/cn';
 import { keys, useDashboard, useInvalidateHealth, useSaveLog } from '@/lib/queries';
-
 
 const SUGGESTION_LINKS: Record<Suggestion['type'], { href: string; icon: LucideIcon }> = {
   LOG_TODAY: { href: '/log', icon: NotebookPen },
@@ -48,94 +48,185 @@ const SUGGESTION_LINKS: Record<Suggestion['type'], { href: string; icon: LucideI
   VISIT_PREP: { href: '/prep', icon: ClipboardList },
 };
 
+const ACTIONS: Array<{ href: string; label: string; icon: LucideIcon; tint: string }> = [
+  { href: '/log', label: 'Log today', icon: NotebookPen, tint: 'bg-olive-soft text-olive-deep' },
+  { href: '/consult', label: 'Ask a doctor', icon: Stethoscope, tint: 'bg-dusk-soft text-dusk-deep' },
+  { href: '/meds', label: 'Medicines', icon: Pill, tint: 'bg-sage-soft text-sage-deep' },
+  { href: '/ec', label: 'Accident help', icon: ShieldQuestion, tint: 'bg-ochre-soft text-ochre-deep' },
+];
+
+/** A small dashboard tile: icon, label, one big value, one quiet line. */
+function Tile({ icon: Icon, label, value, hint, tint, className }: { icon: LucideIcon; label: string; value: string; hint?: string; tint: string; className?: string }) {
+  return (
+    <div className={cn('rounded-card border border-line bg-paper p-5', className)}>
+      <span className={cn('grid size-9 place-items-center rounded-xl', tint)}>
+        <Icon className="size-[18px]" strokeWidth={1.8} />
+      </span>
+      <p className="mt-4 text-xs font-semibold tracking-wide text-ink-soft uppercase">{label}</p>
+      <p className="mt-1 font-display text-2xl leading-tight font-semibold">{value}</p>
+      {hint && <p className="mt-0.5 text-sm text-ink-soft">{hint}</p>}
+    </div>
+  );
+}
+
+function CycleTile({ data }: { data: DashboardResponse }) {
+  const cycle = data.cycle!;
+  const colors = phaseColors[cycle.phase];
+  return (
+    <div className="flex items-center gap-5 rounded-card border border-line bg-paper p-5 sm:col-span-2 lg:row-span-2 lg:flex-col lg:justify-center lg:text-center">
+      <CycleWheel day={cycle.day} cycleLength={cycle.expectedLength} periodLength={cycle.periodLength} className="w-32 shrink-0 lg:w-44">
+        <div>
+          <p className="text-[10px] font-bold tracking-widest text-ink-soft uppercase">Day</p>
+          <p className="font-display text-4xl leading-none font-semibold">{cycle.day}</p>
+        </div>
+      </CycleWheel>
+      <div>
+        <span className="inline-flex rounded-full px-3 py-1 text-xs font-semibold" style={{ background: colors.soft, color: colors.ink }}>
+          {cycle.isPeriod ? 'On your period' : cycle.guide.name}
+        </span>
+        <p className="mt-2 font-semibold">{cycle.guide.vibe}</p>
+        <p className="mt-1 flex items-center gap-1.5 text-xs text-ink-soft lg:justify-center">
+          <Sparkles className="size-3.5" /> {cycle.confidenceNote}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function MoodTile({ data }: { data: DashboardResponse }) {
+  const save = useSaveLog(data.today);
+  const toast = useToast();
+  const current = data.todayLog?.mood ?? null;
+  return (
+    <div className="rounded-card border border-line bg-dusk-soft p-5">
+      <p className="text-xs font-semibold tracking-wide text-dusk-deep uppercase">Today’s mood</p>
+      <div className="mt-3 flex justify-between gap-1">
+        {moodScale.map((m) => (
+          <motion.button
+            key={m.value}
+            type="button"
+            whileTap={{ scale: 0.88 }}
+            onClick={() => save.mutate({ mood: m.value }, { onSuccess: () => toast(`Mood saved: ${m.label}`) })}
+            aria-pressed={current === m.value}
+            aria-label={m.label}
+            title={m.label}
+            className={cn('grid size-11 place-items-center rounded-full transition-colors', current === m.value ? 'bg-dusk-deep text-white' : 'text-dusk-deep hover:bg-paper')}
+          >
+            <ScaleIcon kind="mood" value={m.value} className="size-6" />
+          </motion.button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Actions() {
+  return (
+    <div className="grid grid-cols-2 gap-2 rounded-card border border-line bg-paper p-3">
+      {ACTIONS.map((a) => (
+        <Link key={a.href} href={a.href} className="flex flex-col items-center gap-2 rounded-2xl p-3 text-center text-sm font-semibold transition-colors hover:bg-cream">
+          <span className={cn('grid size-11 place-items-center rounded-2xl', a.tint)}>
+            <a.icon className="size-5" strokeWidth={1.8} />
+          </span>
+          {a.label}
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+interface Alert {
+  id: string;
+  tone: 'danger' | 'warning' | 'info';
+  icon: LucideIcon;
+  title: string;
+  detail?: string;
+  href?: string;
+  onDismiss?: () => void;
+}
+
+const TONE: Record<Alert['tone'], { dot: string; icon: string }> = {
+  danger: { dot: 'bg-cherry', icon: 'bg-cherry-soft text-cherry-deep' },
+  warning: { dot: 'bg-ochre', icon: 'bg-ochre-soft text-ochre-deep' },
+  info: { dot: 'bg-dusk', icon: 'bg-dusk-soft text-dusk-deep' },
+};
+
+/** Everything that needs her attention, in one list. Details open on tap. */
+function Alerts({ data }: { data: DashboardResponse }) {
+  const queryClient = useQueryClient();
+  const reminders = useQuery({ queryKey: keys.reminders, queryFn: api.reminders.list });
+  const [open, setOpen] = useState<string | null>(null);
+
+  const alerts: Alert[] = [
+    ...(reminders.data ?? []).map<Alert>((r) => ({
+      id: r.id,
+      tone: r.due ? 'warning' : 'info',
+      icon: BellRing,
+      title: r.due ? `Today: ${r.title.toLowerCase()}` : r.title,
+      detail: r.due ? 'Three weeks have passed, so a home urine test is reliable now.' : `Reminder set for ${formatDay(r.dueOn, { weekday: true })}.`,
+      onDismiss: async () => {
+        await api.reminders.dismiss(r.id);
+        await queryClient.invalidateQueries({ queryKey: keys.reminders });
+      },
+    })),
+    ...data.redFlags.map<Alert>((f) => ({
+      id: f.code,
+      tone: f.severity === 'URGENT' || f.code === 'PBAC_HEAVY' ? 'danger' : f.severity === 'WARNING' ? 'warning' : 'info',
+      icon: f.code === 'PBAC_HEAVY' ? Droplets : TriangleAlert,
+      title: f.title,
+      detail: f.action,
+      href: f.code === 'PBAC_HEAVY' ? '/report' : '/insights',
+    })),
+  ];
+
+  if (alerts.length === 0) return null;
+  const urgent = alerts.some((a) => a.tone === 'danger');
+
+  return (
+    <Appear tone={urgent ? 'danger' : 'warning'} label={`${alerts.length} alert${alerts.length > 1 ? 's' : ''}`}>
+      <section aria-label="Alerts" className="overflow-hidden rounded-card border border-line bg-paper">
+        <ul className="divide-y divide-line">
+          {alerts.slice(0, 5).map((a) => {
+            const isOpen = open === a.id;
+            return (
+              <li key={a.id}>
+                <div className="flex items-center gap-3 px-4 py-3">
+                  <span className={cn('grid size-9 shrink-0 place-items-center rounded-xl', TONE[a.tone].icon)}>
+                    <a.icon className="size-[18px]" strokeWidth={1.8} />
+                  </span>
+                  <button type="button" onClick={() => setOpen(isOpen ? null : a.id)} aria-expanded={isOpen} className="flex min-w-0 flex-1 items-center gap-2 text-left">
+                    <span className="truncate font-medium">{a.title}</span>
+                    <ChevronDown className={cn('size-4 shrink-0 text-ink-faint transition-transform', isOpen && 'rotate-180')} />
+                  </button>
+                  {a.href && (
+                    <Link href={a.href} className="hidden shrink-0 rounded-full border border-line px-3 py-1 text-xs font-semibold hover:bg-cream sm:inline">
+                      Open
+                    </Link>
+                  )}
+                  {a.onDismiss && (
+                    <button type="button" aria-label="Dismiss" onClick={a.onDismiss} className="shrink-0 rounded-full p-1.5 text-ink-faint hover:bg-cream">
+                      <X className="size-4" />
+                    </button>
+                  )}
+                </div>
+                {isOpen && a.detail && <p className="px-4 pb-4 pl-16 text-sm text-ink-soft">{a.detail}</p>}
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    </Appear>
+  );
+}
+
 function MotherhoodDatePrompt({ stage }: { stage: 'PREGNANCY' | 'POSTPARTUM' }) {
   return (
     <Card sticker tone="olive" className="flex flex-wrap items-center justify-between gap-4">
       <div className="max-w-lg">
         <h2 className="text-2xl font-semibold">{stage === 'PREGNANCY' ? 'Add your due date' : 'Add your baby’s birth date'}</h2>
-        <p className="mt-1 text-sm text-ink-soft">Unlock your week-by-week care plan, danger-sign checks and blood pressure watch.</p>
+        <p className="mt-1 text-sm text-ink-soft">Unlocks your care plan and blood-pressure watch.</p>
       </div>
       <ButtonLink href="/pregnancy">Set it up</ButtonLink>
-    </Card>
-  );
-}
-
-function CycleHero({ data }: { data: DashboardResponse }) {
-  const cycle = data.cycle!;
-  const colors = phaseColors[cycle.phase];
-  const next = cycle.nextPeriod;
-
-  return (
-    <Card sticker className="relative overflow-hidden p-0 sm:p-0">
-      <div className="grid items-center gap-6 p-5 sm:p-6 md:grid-cols-[minmax(0,200px)_1fr]">
-        <CycleWheel day={cycle.day} cycleLength={cycle.expectedLength} periodLength={cycle.periodLength} className="mx-auto w-full max-w-[200px]">
-          <div>
-            <p className="text-xs font-bold tracking-widest text-ink-soft uppercase">Day</p>
-            <p className="font-display text-5xl leading-none font-semibold">{cycle.day}</p>
-            <p className="mt-1 text-sm font-bold" style={{ color: colors.ink }}>
-              {cycle.guide.vibe}
-            </p>
-          </div>
-        </CycleWheel>
-        <div>
-          <span className="inline-flex rounded-full px-3 py-1 text-xs font-semibold tracking-wide uppercase" style={{ background: colors.soft, color: colors.ink }}>
-            {cycle.isPeriod ? 'On your period' : cycle.guide.name}
-          </span>
-          <h2 className="mt-3 text-lg leading-snug font-semibold">{cycle.guide.vibe}</h2>
-          {next && (
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-3xl bg-cherry-soft p-4">
-                <p className="text-xs font-bold tracking-wide text-cherry-deep uppercase">{next.isLate ? 'Period is late' : 'Next period'}</p>
-                <p className="font-display text-2xl font-semibold text-cherry-deep">
-                  {next.isLate ? `${next.daysLate} days late` : relativeDay(next.date, data.today)}
-                </p>
-                <p className="text-sm text-cherry-deep/80">
-                  {formatDay(next.windowStart)} – {formatDay(next.windowEnd)}
-                </p>
-              </div>
-              <div className="rounded-3xl bg-ochre-soft p-4">
-                <p className="text-xs font-bold tracking-wide text-ochre-deep uppercase">Fertile window</p>
-                <p className="font-display text-2xl font-semibold text-ochre-deep">
-                  {formatDay(cycle.fertileWindow.start)} – {formatDay(cycle.fertileWindow.end)}
-                </p>
-                <p className="text-sm text-ochre-deep/80">Ovulation ≈ {formatDay(cycle.fertileWindow.ovulation)}</p>
-              </div>
-            </div>
-          )}
-          <p className="mt-4 flex items-center gap-2 text-sm text-ink-soft">
-            <Sparkles className="size-4 text-olive-deep" /> {cycle.confidenceNote}
-          </p>
-        </div>
-      </div>
-    </Card>
-  );
-}
-
-function MoodCheckIn({ data }: { data: DashboardResponse }) {
-  const save = useSaveLog(data.today);
-  const toast = useToast();
-  const current = data.todayLog?.mood ?? null;
-  return (
-    <Card tone="dusk">
-      <p className="text-xs font-bold tracking-widest text-dusk-deep uppercase">Daily check-in</p>
-      <h3 className="mt-1 text-2xl font-semibold">How are you feeling today?</h3>
-      <div className="mt-4 flex justify-between gap-2">
-        {moodScale.map((m) => (
-          <motion.button
-            key={m.value}
-            type="button"
-            whileTap={{ scale: 0.85 }}
-            whileHover={{ y: -4 }}
-            onClick={() => save.mutate({ mood: m.value }, { onSuccess: () => toast(`Mood saved: ${m.label}`) })}
-            className={cn('flex flex-1 flex-col items-center gap-1 rounded-2xl py-2.5 text-xs font-bold transition-colors', current === m.value ? 'bg-paper shadow-lift ring-2 ring-ink' : 'hover:bg-paper/60')}
-            aria-pressed={current === m.value}
-          >
-            <ScaleIcon kind="mood" value={m.value} className="size-8" />
-            {m.label}
-          </motion.button>
-        ))}
-      </div>
-      <TalkToLog className="mt-5" />
     </Card>
   );
 }
@@ -145,11 +236,11 @@ function EmptyCycle() {
   const [loading, setLoading] = useState(false);
   const { user, setUser } = useAuth();
   return (
-    <Card sticker tone="olive" className="relative overflow-hidden">
+    <Card sticker tone="olive" className="relative overflow-hidden sm:col-span-2 lg:col-span-4">
       <Blob className="absolute -right-10 -bottom-12 size-48" color="#D9AA55" variant={2} />
       <div className="relative max-w-lg">
-        <h2 className="text-3xl font-semibold">Let’s find your rhythm</h2>
-        <p className="mt-2 text-ink-soft">Log your period when it starts and Cherri will start predicting, then get smarter with every cycle.</p>
+        <h2 className="text-2xl font-semibold">Let’s find your rhythm</h2>
+        <p className="mt-2 text-ink-soft">Log your period and Cherri starts predicting.</p>
         <div className="mt-5 flex flex-wrap gap-3">
           <ButtonLink href="/log" size="md">
             Log today
@@ -178,88 +269,6 @@ function EmptyCycle() {
   );
 }
 
-function Reminders() {
-  const queryClient = useQueryClient();
-  const reminders = useQuery({ queryKey: keys.reminders, queryFn: api.reminders.list });
-  if (!reminders.data?.length) return null;
-  return (
-    <div className="space-y-3">
-      {reminders.data.map((r) => (
-        <div key={r.id} className={cn('flex items-center gap-3 rounded-card border p-4 shadow-lift', r.due ? 'border-ochre bg-ochre-soft' : 'border-line bg-paper')}>
-          <BellRing className={cn('size-6 shrink-0', r.due ? 'text-ochre-deep' : 'text-ink-faint')} />
-          <p className="flex-1 text-[15px]">
-            <strong>{r.due ? `Today: ${r.title.toLowerCase()}` : r.title}</strong>
-            <span className="block text-sm text-ink-soft">
-              {r.due ? 'It has been 3 weeks since the accident, so a home urine test is reliable now.' : `Reminder set for ${formatDay(r.dueOn, { weekday: true })}.`}
-            </span>
-          </p>
-          <button
-            type="button"
-            aria-label="Dismiss reminder"
-            onClick={async () => {
-              await api.reminders.dismiss(r.id);
-              await queryClient.invalidateQueries({ queryKey: keys.reminders });
-            }}
-            className="rounded-full p-2 hover:bg-cream-deep"
-          >
-            <X className="size-4" />
-          </button>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function HeavyBleedingCard({ title }: { title: string }) {
-  return (
-    <Card sticker tone="cherry" className="flex flex-wrap items-center gap-4 border-cherry/40">
-      <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-cherry text-cream">
-        <Droplets className="size-7" />
-      </span>
-      <div className="min-w-0 flex-1">
-        <p className="text-xs font-semibold tracking-[0.18em] text-cherry-deep uppercase">Blood loss warning</p>
-        <h2 className="text-2xl font-semibold">{title}</h2>
-        <p className="text-sm text-ink-soft">
-          A score over 100 (about 80 mL) is heavy menstrual bleeding. It can cause anaemia and has treatable causes such as fibroids or polyps. It now leads your doctor report.
-        </p>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        <ButtonLink href="/report" size="sm">
-          Doctor report
-        </ButtonLink>
-        <ButtonLink href="/consult" variant="outline" size="sm">
-          Ask a doctor
-        </ButtonLink>
-      </div>
-    </Card>
-  );
-}
-
-const TOOLS = [
-  { href: '/consult', icon: Stethoscope, title: 'Consult a doctor', text: 'Async chat · reply in 4–12 h', tint: 'bg-dusk-soft text-dusk-deep' },
-  { href: '/meds', icon: Pill, title: 'Medicine guardian', text: 'Timing, clashes, missed pill', tint: 'bg-olive-soft text-olive-deep' },
-  { href: '/ec', icon: ShieldQuestion, title: 'Had an accident?', text: 'Emergency contraception plan', tint: 'bg-ochre-soft text-ochre-deep' },
-] as const;
-
-function Tools() {
-  return (
-    <div className="grid gap-3 sm:grid-cols-3">
-      {TOOLS.map((t) => (
-        <Link key={t.href} href={t.href} className="group flex items-center gap-3 rounded-card border border-line bg-paper p-4 shadow-lift transition-transform hover:-translate-y-0.5">
-          <span className={cn('grid size-11 shrink-0 place-items-center rounded-2xl', t.tint)}>
-            <t.icon className="size-5" />
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block font-semibold">{t.title}</span>
-            <span className="block text-sm text-ink-soft">{t.text}</span>
-          </span>
-          <ArrowRight className="size-4 shrink-0 text-ink-faint transition-transform group-hover:translate-x-1" />
-        </Link>
-      ))}
-    </div>
-  );
-}
-
 export default function HomePage() {
   const { user } = useAuth();
   const { data, isLoading, error } = useDashboard();
@@ -269,35 +278,42 @@ export default function HomePage() {
   if (error || !data) return <ErrorNote error={error} />;
 
   const name = firstName(data.user.name ?? user?.name);
-  const heavy = data.redFlags.find((f) => f.code === 'PBAC_HEAVY');
+  const cycle = data.cycle;
+  const next = cycle?.nextPeriod;
+  const suggestion = data.suggestions[0];
 
   return (
-    <div className="space-y-8">
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-sm font-bold text-ink-soft">{formatDay(data.today, { weekday: true })}</p>
-          <h1 className="text-4xl leading-none font-semibold sm:text-5xl">
-            {greeting(hour)}
-            {name ? `, ${name}` : ''} {hour < 17 ? '' : ''}
-          </h1>
-        </div>
-        {data.streak > 0 && (
-          <span className="inline-flex items-center gap-2 rounded-full border border-ink/10 bg-clay px-4 py-2 font-display font-semibold shadow-lift">
-            <Flame className="size-5" /> {data.streak}-day streak
-          </span>
-        )}
+    <div className="space-y-6">
+      <header>
+        <p className="text-sm font-semibold text-ink-soft">{formatDay(data.today, { weekday: true })}</p>
+        <h1 className="mt-1 text-3xl leading-tight font-semibold sm:text-4xl">
+          {greeting(hour)}
+          {name ? `, ${name}` : ''}
+        </h1>
       </header>
 
-      <Reminders />
+      <Alerts data={data} />
 
-      {heavy && (
-        <Appear tone="danger" label="Warning">
-          <HeavyBleedingCard title={heavy.title} />
-        </Appear>
-      )}
-
-      {data.cycle ? (
-        <CycleHero data={data} />
+      {cycle ? (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <CycleTile data={data} />
+          <Tile
+            icon={Droplets}
+            label={next?.isLate ? 'Period is late' : 'Next period'}
+            value={next ? (next.isLate ? `${next.daysLate} days late` : relativeDay(next.date, data.today)) : '—'}
+            hint={next ? `${formatDay(next.windowStart)} – ${formatDay(next.windowEnd)}` : undefined}
+            tint="bg-cherry-soft text-cherry-deep"
+          />
+          <Tile
+            icon={CalendarHeart}
+            label="Fertile window"
+            value={`${formatDay(cycle.fertileWindow.start)} – ${formatDay(cycle.fertileWindow.end)}`}
+            hint={`Ovulation ≈ ${formatDay(cycle.fertileWindow.ovulation)}`}
+            tint="bg-ochre-soft text-ochre-deep"
+          />
+          <MoodTile data={data} />
+          <Tile icon={Flame} label="Logging streak" value={`${data.streak} day${data.streak === 1 ? '' : 's'}`} hint="Keep it going" tint="bg-clay-soft text-clay-deep" />
+        </div>
       ) : data.motherhood ? (
         <MotherhoodHero status={data.motherhood} compact />
       ) : data.user.lifeStage === 'PREGNANCY' || data.user.lifeStage === 'POSTPARTUM' ? (
@@ -306,65 +322,32 @@ export default function HomePage() {
         <EmptyCycle />
       )}
 
-      <Tools />
-
-      <div className="grid items-start gap-6 lg:grid-cols-[1.1fr_1fr]">
-        <MoodCheckIn data={data} />
-        <div className="space-y-4">
-          {data.suggestions.slice(0, 2).map((s) => (
-            <Link
-              key={`${s.type}-${s.screening ?? ''}`}
-              href={s.type === 'SCREENING' && s.screening ? `/checks/${s.screening}` : SUGGESTION_LINKS[s.type].href}
-              className={cn(
-                'group flex items-center gap-4 rounded-card border border-ink/10 p-4 shadow-lift transition-transform hover:-translate-y-0.5',
-                s.type === 'DANGER_CHECK' ? 'bg-cherry-soft' : 'bg-paper',
-              )}
-            >
-              <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-ochre-soft text-ochre-deep">
-                {(() => {
-                  const Icon = SUGGESTION_LINKS[s.type].icon;
-                  return <Icon className="size-5" strokeWidth={1.8} />;
-                })()}
+      <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
+        <Actions />
+        {suggestion ? (
+          <Link
+            href={suggestion.type === 'SCREENING' && suggestion.screening ? `/checks/${suggestion.screening}` : SUGGESTION_LINKS[suggestion.type].href}
+            className="group flex items-center gap-4 rounded-card border border-line bg-olive-soft p-5 transition-colors hover:bg-olive-soft/70"
+          >
+            <span className="grid size-12 shrink-0 place-items-center rounded-2xl bg-paper text-olive-deep">
+              {(() => {
+                const Icon = SUGGESTION_LINKS[suggestion.type].icon;
+                return <Icon className="size-5" strokeWidth={1.8} />;
+              })()}
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-xs font-semibold tracking-wide text-olive-deep uppercase">Suggested next</span>
+              <span className="mt-0.5 block font-semibold">
+                {suggestion.type === 'SCREENING' && suggestion.screening ? `Take the ${SCREENINGS[suggestion.screening].title}` : suggestion.title}
               </span>
-              <span className="min-w-0 flex-1">
-                <span className="block font-semibold">
-                  {s.type === 'SCREENING' && s.screening ? `Take the ${SCREENINGS[s.screening].title}` : s.title}
-                </span>
-                <span className="line-clamp-1 text-sm text-ink-soft">{s.reason}</span>
-              </span>
-              <ArrowRight className="size-5 shrink-0 transition-transform group-hover:translate-x-1" />
-            </Link>
-          ))}
-          {data.suggestions.length === 0 && (
-            <Card tone="sage" className="flex items-center gap-4">
-              <Sticker className="relative size-20 shrink-0" textClassName="px-2 text-[11px]" color="#D9AA55" tilt={-8}>
-                All good
-              </Sticker>
-              <p className="text-sm">Nothing needs your attention right now. Keep logging and Cherri will keep watching for patterns.</p>
-            </Card>
-          )}
-        </div>
+              <span className="line-clamp-1 text-sm text-ink-soft">{suggestion.reason}</span>
+            </span>
+            <ArrowRight className="size-5 shrink-0 text-olive-deep transition-transform group-hover:translate-x-1" />
+          </Link>
+        ) : (
+          <div className="flex items-center rounded-card border border-line bg-sage-soft p-5 text-sm font-medium text-sage-deep">Nothing needs your attention right now.</div>
+        )}
       </div>
-
-      {data.redFlags.filter((f) => f.code !== 'PBAC_HEAVY').length > 0 && (
-        <section>
-          <SectionTitle eyebrow="Worth a look" title="To raise with a doctor" action={<ButtonLink href="/insights" variant="ghost" size="sm">Details <ArrowRight className="size-4" /></ButtonLink>} />
-          <ul className="divide-y divide-line overflow-hidden rounded-card border border-line bg-paper">
-            {data.redFlags
-              .filter((f) => f.code !== 'PBAC_HEAVY')
-              .slice(0, 4)
-              .map((flag) => (
-                <li key={flag.code}>
-                  <Link href="/insights" className="flex items-center gap-3 px-5 py-4 transition-colors hover:bg-cream">
-                    <span className={cn('size-2.5 shrink-0 rounded-full', flag.severity === 'URGENT' ? 'bg-cherry' : flag.severity === 'WARNING' ? 'bg-ochre' : 'bg-dusk')} />
-                    <span className="flex-1 font-medium">{flag.title}</span>
-                    <ArrowRight className="size-4 text-ink-faint" />
-                  </Link>
-                </li>
-              ))}
-          </ul>
-        </section>
-      )}
     </div>
   );
 }

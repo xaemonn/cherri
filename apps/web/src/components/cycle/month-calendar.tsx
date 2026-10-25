@@ -68,7 +68,7 @@ export function MonthCalendar({
           <ChevronRight className="size-5" />
         </button>
       </div>
-      <div className="grid grid-cols-7 gap-1.5 text-center text-xs font-bold text-ink-soft">
+      <div className="grid grid-cols-7 gap-y-1.5 text-center text-xs font-bold text-ink-soft">
         {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
           <span key={i} className="pb-1">
             {d}
@@ -82,8 +82,8 @@ export function MonthCalendar({
             <span
               key={date}
               className={cn(
-                'relative grid aspect-square place-items-center rounded-2xl text-sm font-bold text-ink transition-transform',
-                isToday && 'ring-[3px] ring-ink ring-offset-2 ring-offset-paper',
+                'relative mx-auto grid size-10 place-items-center rounded-full text-sm font-semibold text-ink transition-transform sm:size-11',
+                isToday && 'ring-2 ring-olive-deep ring-offset-2 ring-offset-paper',
               )}
               style={{
                 background:

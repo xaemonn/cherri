@@ -14,16 +14,16 @@ export const fonts = {
 
 export const radius = { md: 18, lg: 24, card: 28, pill: 999 } as const;
 
-/** Soft tints matching the web app (no pink: light reds become apricot). */
+/** Calming bluish tints matching the web app. */
 export const tones = {
   paper: { bg: colors.paper, border: colors.line },
   cream: { bg: colors.creamDeep, border: colors.line },
-  matcha: { bg: '#F8E6EE', border: '#EDC9D8' },
-  sunshine: { bg: '#F8EED8', border: '#EBD9AE' },
-  periwinkle: { bg: '#EFEBFA', border: '#D9D1F2' },
-  tangerine: { bg: '#FBEBE2', border: '#F1D2C0' },
-  sage: { bg: '#E6F2EC', border: '#C9E2D6' },
-  apricot: { bg: '#FBE4E7', border: '#F2C6CD' },
+  matcha: { bg: '#E0F0FE', border: '#BDE0FE' },
+  sunshine: { bg: '#ECF5FF', border: '#A2D2FF' },
+  periwinkle: { bg: '#F4EEF9', border: '#CDB4DB' },
+  tangerine: { bg: '#FFEDF3', border: '#FFAFCC' },
+  sage: { bg: '#EAF4FE', border: '#BDE0FE' },
+  apricot: { bg: '#FFEDF3', border: '#FFAFCC' },
   ink: { bg: colors.ink, border: colors.ink },
 } as const;
 

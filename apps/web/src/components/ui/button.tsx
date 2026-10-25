@@ -6,10 +6,10 @@ type Variant = 'primary' | 'olive' | 'outline' | 'ghost' | 'cream';
 type Size = 'sm' | 'md' | 'lg';
 
 const VARIANTS: Record<Variant, string> = {
-  primary: 'bg-ink text-cream hover:bg-[#46362A]',
+  primary: 'bg-ink text-cream hover:bg-forest',
   olive: 'bg-olive-deep text-cream shadow-lift hover:-translate-y-0.5 hover:bg-forest hover:shadow-lift-lg active:translate-y-0',
-  outline: 'border border-ink/25 text-ink hover:border-ink hover:bg-ink hover:text-cream',
-  ghost: 'text-ink hover:bg-cream-deep',
+  outline: 'border border-line bg-paper/90 text-ink hover:border-olive-deep hover:bg-cream-deep hover:text-olive-deep',
+  ghost: 'text-ink-soft hover:bg-cream-deep hover:text-ink',
   cream: 'bg-cream text-ink hover:bg-paper',
 };
 

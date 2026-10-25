@@ -11,9 +11,10 @@ import {
   type PillType,
 } from '@cherri/shared';
 import { useQueryClient } from '@tanstack/react-query';
-import { AlarmClock, CircleAlert, Info, OctagonAlert, Plus, ShieldCheck, X } from 'lucide-react';
+import { AlarmClock, Pill as PillIcon, CircleAlert, Info, OctagonAlert, Plus, ShieldCheck, X } from 'lucide-react';
 import { useState } from 'react';
 import { Appear } from '@/components/ui/appear';
+import { Tabs } from '@/components/ui/tabs';
 import { Button, ButtonLink } from '@/components/ui/button';
 import { Card, SectionTitle } from '@/components/ui/card';
 import { Chip } from '@/components/ui/chip';
@@ -49,6 +50,7 @@ function Guardian() {
   const queryClient = useQueryClient();
   const [extra, setExtra] = useState<string[]>([]);
   const [name, setName] = useState('');
+  const [view, setView] = useState<'timing' | 'clashes'>('timing');
 
   const saved = (meds.data ?? []).filter((m) => m.active);
   const list = [...saved.map((m) => ({ id: m.id, name: m.name })), ...extra.map((n) => ({ name: n }))];
@@ -120,9 +122,26 @@ function Guardian() {
         </EmptyState>
       ) : (
         <>
-          {guidance.conflicts.length > 0 ? (
+          <div className="flex flex-wrap items-center gap-3">
+            <Tabs
+              value={view}
+              onChange={setView}
+              tabs={[
+                { id: 'timing', label: 'When to take', icon: AlarmClock },
+                { id: 'clashes', label: 'Clashes', icon: CircleAlert, badge: guidance.conflicts.length },
+              ]}
+            />
+            {guidance.conflicts.length > 0 && view === 'timing' && (
+              <Appear key={guidance.conflicts.length} tone="warning" label={null} className="rounded-full">
+                <button type="button" onClick={() => setView('clashes')} className="rounded-full bg-ochre-soft px-4 py-2 text-sm font-semibold text-ochre-deep">
+                  {guidance.conflicts.length} clash{guidance.conflicts.length > 1 ? 'es' : ''} found · View
+                </button>
+              </Appear>
+            )}
+          </div>
+
+          {view === 'clashes' && (guidance.conflicts.length > 0 ? (
             <section aria-label="Clashes">
-              <SectionTitle eyebrow="Step 2" title={`${guidance.conflicts.length} clash${guidance.conflicts.length > 1 ? 'es' : ''} to fix`} />
               <div className="space-y-3">
                 {guidance.conflicts.map((c) => {
                   const s = SEVERITY[c.severity];
@@ -146,10 +165,10 @@ function Guardian() {
             <p className="flex items-center gap-2 rounded-card bg-olive-soft px-4 py-3 font-medium text-olive-deep">
               <ShieldCheck className="size-5" /> No clashes between these medicines.
             </p>
-          )}
+          ))}
 
+          {view === 'timing' && (
           <section aria-label="Timing rules">
-            <SectionTitle eyebrow="Step 3" title="When and how to take each one" />
             <div className="grid gap-4 md:grid-cols-2">
               {guidance.medicines.map((m) => (
                 <Card key={m.id ?? m.name}>
@@ -186,6 +205,7 @@ function Guardian() {
               ))}
             </div>
           </section>
+          )}
         </>
       )}
     </div>
@@ -274,15 +294,19 @@ function MissedPill() {
 }
 
 export default function MedsPage() {
+  const [tab, setTab] = useState<'meds' | 'missed'>('meds');
   return (
-    <div>
-      <PageHeader eyebrow="Medicine guardian" title="Take your medicines the right way">
-        Food timing, clashes and missed pills. Not a substitute for your pharmacist.
-      </PageHeader>
-      <div className="grid items-start gap-6 xl:grid-cols-[1.4fr_1fr]">
-        <Guardian />
-        <MissedPill />
-      </div>
+    <div className="space-y-6">
+      <PageHeader eyebrow="Medicine guardian" title="Take your medicines the right way" />
+      <Tabs
+        value={tab}
+        onChange={setTab}
+        tabs={[
+          { id: 'meds', label: 'My medicines', icon: PillIcon },
+          { id: 'missed', label: 'Missed a pill?', icon: AlarmClock },
+        ]}
+      />
+      <div className="max-w-4xl">{tab === 'meds' ? <Guardian /> : <MissedPill />}</div>
     </div>
   );
 }

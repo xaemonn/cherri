@@ -406,7 +406,7 @@ export default function LogPage() {
         </>
       )}
 
-      <div className="sticky bottom-24 z-30 mt-8 flex justify-end lg:bottom-6">
+      <div className="sticky bottom-24 z-30 mt-8 flex justify-start lg:bottom-6">
         <Button variant="olive" size="lg" onClick={submit} disabled={save.isPending || isLoading}>
           {save.isPending ? 'Saving…' : `Save ${date === today ? 'today' : formatDay(date)}`}
         </Button>
